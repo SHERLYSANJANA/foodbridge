@@ -1,6 +1,37 @@
+import { useState, useEffect } from "react";
 import { Heart, MapPin } from "lucide-react";
+import { supabase } from "../supabaseClient";
 
 export default function LandingPageComponent({ onNavigateAuth }) {
+  const [listings, setListings] = useState([]);
+  const [loadingListings, setLoadingListings] = useState(true);
+  const [listingsError, setListingsError] = useState("");
+
+  useEffect(() => {
+    const fetchListings = async () => {
+      setLoadingListings(true);
+      setListingsError("");
+      try {
+        const { data, error } = await supabase
+          .from("donations")
+          .select(
+            "id, food_name, quantity, location, expiry_time, food_type, updated_at",
+          )
+          .order("updated_at", { ascending: false })
+          .limit(8);
+
+        if (error) throw error;
+        setListings(data || []);
+      } catch (err) {
+        setListingsError(err.message || "Failed to load listings.");
+      } finally {
+        setLoadingListings(false);
+      }
+    };
+
+    fetchListings();
+  }, []);
+
   return (
     <>
       {/* Top Navigation Overlay */}
@@ -10,7 +41,7 @@ export default function LandingPageComponent({ onNavigateAuth }) {
         </a>
         <div className="flex gap-4 items-center">
           <button
-            onClick={() => onNavigateAuth('signin')}
+            onClick={() => onNavigateAuth("signin")}
             style={{
               background: "transparent",
               border: "none",
@@ -24,7 +55,7 @@ export default function LandingPageComponent({ onNavigateAuth }) {
           </button>
           <button
             className="btn btn-primary"
-            onClick={() => onNavigateAuth('signup')}
+            onClick={() => onNavigateAuth("signup")}
             style={{ padding: "0.6rem 1.5rem", width: "auto" }}
           >
             Get Started
@@ -47,10 +78,16 @@ export default function LandingPageComponent({ onNavigateAuth }) {
           Zero waste, maximum impact.
         </p>
         <div className="hero-buttons">
-          <button className="btn btn-primary" onClick={() => onNavigateAuth('signup')}>
+          <button
+            className="btn btn-primary"
+            onClick={() => onNavigateAuth("signup")}
+          >
             I Want to Donate Food
           </button>
-          <button className="btn btn-secondary" onClick={() => onNavigateAuth('signup')}>
+          <button
+            className="btn btn-secondary"
+            onClick={() => onNavigateAuth("signup")}
+          >
             I Need Food
           </button>
         </div>
@@ -135,90 +172,69 @@ export default function LandingPageComponent({ onNavigateAuth }) {
         </div>
       </div>
 
-      {/* Mock Listings Preview Carousel */}
+      {/* Live Listings Preview Carousel */}
       <div className="listings-preview-container animate-fade-in stagger-4">
-        <div className="horizontal-scroll-wrapper">
-          <div className="preview-card">
-            <div className="preview-card-image-placeholder"></div>
-            <div className="preview-card-content">
-              <h3 className="preview-card-title">Fresh Biryani Portions</h3>
-              <p className="preview-card-meta">College Mess - IIT Delhi</p>
-              <div className="preview-card-stats">
-                <span>50 portions</span>
-                <span className="preview-card-urgency">Expires in 2h 15m</span>
-              </div>
-              <div className="preview-tags">
-                <span className="preview-tag">Non-Veg</span>
-                <span className="preview-tag">Halal</span>
-              </div>
-            </div>
-          </div>
+        <h2 className="how-it-works-title">Recent Food Listings</h2>
 
-          <div className="preview-card">
-            <div className="preview-card-image-placeholder"></div>
-            <div className="preview-card-content">
-              <h3 className="preview-card-title">Packaged Bread & Butter</h3>
-              <p className="preview-card-meta">City Bakery</p>
-              <div className="preview-card-stats">
-                <span>30 packets</span>
-                <span
-                  className="preview-card-urgency"
-                  style={{ color: "#D46A3D" }}
-                >
-                  Expires in 5h 30m
-                </span>
-              </div>
-              <div className="preview-tags">
-                <span className="preview-tag">Veg</span>
-              </div>
-            </div>
+        {listingsError && (
+          <p style={{ color: "#EF4444", textAlign: "center" }}>
+            {listingsError}
+          </p>
+        )}
+        {loadingListings ? (
+          <p style={{ textAlign: "center", color: "var(--text-muted)" }}>
+            Loading listings...
+          </p>
+        ) : listings.length === 0 ? (
+          <p style={{ textAlign: "center", color: "var(--text-muted)" }}>
+            No food listings available right now. Please check again soon.
+          </p>
+        ) : (
+          <div className="horizontal-scroll-wrapper">
+            {listings.map((item) => {
+              const now = new Date();
+              const exp = item.expiry_time ? new Date(item.expiry_time) : null;
+              const expiresIn = exp
+                ? Math.max(0, Math.floor((exp - now) / (1000 * 60)))
+                : null;
+              return (
+                <div className="preview-card" key={item.id}>
+                  <div className="preview-card-image-placeholder" />
+                  <div className="preview-card-content">
+                    <h3 className="preview-card-title">{item.food_name}</h3>
+                    <p className="preview-card-meta">
+                      {item.location || "Unknown location"} •{" "}
+                      {item.food_type?.toUpperCase()}
+                    </p>
+                    <div className="preview-card-stats">
+                      <span>
+                        {item.quantity
+                          ? `${item.quantity} portions`
+                          : "Quantity unknown"}
+                      </span>
+                      <span className="preview-card-urgency">
+                        {exp
+                          ? exp < now
+                            ? "Expired"
+                            : `Expires in ${Math.floor(expiresIn / 60)}h ${expiresIn % 60}m`
+                          : "No expiry set"}
+                      </span>
+                    </div>
+                    <div className="preview-tags">
+                      <span className="preview-tag">
+                        {item.food_type === "non-veg" ? "Non-Veg" : "Veg"}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
-
-          <div className="preview-card">
-            <div className="preview-card-image-placeholder"></div>
-            <div className="preview-card-content">
-              <h3 className="preview-card-title">Fruit Salad Bowls</h3>
-              <p className="preview-card-meta">Event Caterers</p>
-              <div className="preview-card-stats">
-                <span>25 bowls</span>
-                <span
-                  className="preview-card-urgency"
-                  style={{ color: "#D46A3D" }}
-                >
-                  Expires in 1h 45m
-                </span>
-              </div>
-              <div className="preview-tags">
-                <span className="preview-tag">Vegan</span>
-                <span className="preview-tag">Gluten-Free</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="preview-card">
-            <div className="preview-card-image-placeholder"></div>
-            <div className="preview-card-content">
-              <h3 className="preview-card-title">Cookie Platter</h3>
-              <p className="preview-card-meta">Community Bake Sale</p>
-              <div className="preview-card-stats">
-                <span>40 portions</span>
-                <span
-                  className="preview-card-urgency"
-                  style={{ color: "#D46A3D" }}
-                >
-                  Expires in 10h
-                </span>
-              </div>
-              <div className="preview-tags">
-                <span className="preview-tag">Veg</span>
-              </div>
-            </div>
-          </div>
-        </div>
+        )}
 
         <button
           className="btn btn-amber"
-          onClick={onNavigateAuth}
+          onClick={() => onNavigateAuth("signup")}
           style={{ marginTop: "3rem", padding: "1rem 2.5rem", fontWeight: 700 }}
         >
           View All Listings &rarr;
@@ -259,10 +275,16 @@ export default function LandingPageComponent({ onNavigateAuth }) {
           <div>
             <h4 className="footer-column-title">Get Started</h4>
             <div className="footer-links">
-              <button className="footer-link" onClick={() => onNavigateAuth('signup')}>
+              <button
+                className="footer-link"
+                onClick={() => onNavigateAuth("signup")}
+              >
                 Sign Up
               </button>
-              <button className="footer-link" onClick={() => onNavigateAuth('signin')}>
+              <button
+                className="footer-link"
+                onClick={() => onNavigateAuth("signin")}
+              >
                 Sign In
               </button>
             </div>
