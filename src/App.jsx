@@ -35,7 +35,7 @@ const BackgroundArt = () => (
     {/* Cluster Bottom Right */}
     <Coffee className="global-art-element" size={110} style={{ bottom: '10%', right: '12%', animationDelay: '1.8s', color: 'var(--art-color-1)' }} strokeWidth={1} />
     <Beef className="global-art-element" size={90} style={{ bottom: '25%', right: '28%', animationDelay: '0.8s', color: 'var(--art-color-2)' }} strokeWidth={1} />
-    
+
     {/* Center Drift */}
     <Pizza className="global-art-element" size={180} style={{ top: '35%', left: '42%', animationDelay: '7s', color: 'var(--art-color-4)' }} strokeWidth={0.5} />
   </div>
@@ -57,16 +57,23 @@ function App() {
     }
 
     const fetchSessionAndStatus = async () => {
-      const { data: { session: currentSession } } = await supabase.auth.getSession();
-      setSession(currentSession);
-      
-      if (currentSession) {
-        const { data } = await supabase.from('verification_requests').select('status').eq('donor_id', currentSession.user.id).order('created_at', { ascending: false }).limit(1);
-        if (data && data.length > 0) {
-          setVerifiedStatus(data[0].status);
+      try {
+        const { data: { session: currentSession }, error: authError } = await supabase.auth.getSession();
+        if (authError) throw authError;
+        setSession(currentSession);
+
+        if (currentSession) {
+          const { data, error } = await supabase.from('verification_requests').select('status').eq('donor_id', currentSession.user.id).order('created_at', { ascending: false }).limit(1);
+          if (error) console.error("Verification check failed:", error);
+          else if (data && data.length > 0) {
+            setVerifiedStatus(data[0].status);
+          }
         }
+      } catch (err) {
+        console.error("Session init failed:", err);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
 
     fetchSessionAndStatus();
@@ -74,18 +81,35 @@ function App() {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, newSession) => {
       setSession(newSession);
       if (newSession) {
-        const { data } = await supabase.from('verification_requests').select('status').eq('donor_id', newSession.user.id).order('created_at', { ascending: false }).limit(1);
-        if (data && data.length > 0) setVerifiedStatus(data[0].status);
+        try {
+          const { data, error } = await supabase.from('verification_requests').select('status').eq('donor_id', newSession.user.id).order('created_at', { ascending: false }).limit(1);
+          if (!error && data && data.length > 0) setVerifiedStatus(data[0].status);
+        } catch (e) {
+          console.error("Auth state update failed", e);
+        }
       } else {
         setVerifiedStatus(null);
       }
     });
 
-    return () => subscription.unsubscribe();
+    // Fallback to guarantee the app ALWAYS unblocks the loading screen
+    const loadingTimeout = setTimeout(() => {
+      setLoading(false);
+    }, 1500);
+
+    return () => {
+      subscription?.unsubscribe();
+      clearTimeout(loadingTimeout);
+    };
   }, []);
 
-  const handleSignOut = async () => {
-    await supabase.auth.signOut();
+  const handleSignOut = () => {
+    // Fire the network call in the background without waiting for it
+    supabase.auth.signOut().catch(e => console.error("Sign out error:", e));
+    
+    // Force the local session to wipe immediately
+    setSession(null);
+    setVerifiedStatus(null);
   };
 
   const toggleTheme = () => {
@@ -159,7 +183,7 @@ function App() {
         <div>
           <Link to="/" className="brand">
             <Utensils size={24} /> FoodBridge
-            {verifiedStatus === 'approved' && <ShieldCheck size={18} color="#10B981" style={{marginLeft: '0.4rem'}} title="Verified Donor" />}
+            {verifiedStatus === 'approved' && <ShieldCheck size={18} color="#10B981" style={{ marginLeft: '0.4rem' }} title="Verified Donor" />}
           </Link>
           <div className="nav-links animate-fade-in stagger-1">
             {!isAcceptor && (
