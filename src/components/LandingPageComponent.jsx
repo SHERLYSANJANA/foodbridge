@@ -17,9 +17,9 @@ export default function LandingPageComponent({ onNavigateAuth }) {
         const { data, error } = await supabase
           .from("donations")
           .select(
-            "id, food_name, quantity, location, expiry_time, food_type, updated_at",
+            "id, food_name, quantity, location, expiry_time, food_type, created_at",
           )
-          .order("updated_at", { ascending: false })
+          .order("created_at", { ascending: false })
           .limit(8);
 
         if (!active) return;
