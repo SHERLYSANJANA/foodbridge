@@ -14,6 +14,7 @@ const GoogleIcon = () => (
 
 export default function AuthComponent() {
   const [isLogin, setIsLogin] = useState(true);
+  const [isForgotPassword, setIsForgotPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [msg, setMsg] = useState('');
@@ -75,75 +76,135 @@ export default function AuthComponent() {
     }
   };
 
+  const handleForgotPassword = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+    setMsg('');
+
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: window.location.origin
+      });
+      if (error) throw error;
+      setMsg('Success! Check your email for a password reset link.');
+    } catch (err) {
+      setError(err.message || 'Error sending password reset link.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="flex items-center justify-center animate-fade-in" style={{ minHeight: '80vh' }}>
       <div className="card stagger-1" style={{ maxWidth: '450px', width: '100%' }}>
         <h2 className="page-title text-center" style={{ fontSize: '1.75rem', marginBottom: '2rem' }}>
-          {isLogin ? 'Welcome Back' : 'Join Need for Food'}
+          {isForgotPassword ? 'Reset Password' : isLogin ? 'Welcome Back' : 'Join Need for Food'}
         </h2>
 
         {error && <div className="badge badge-outline" style={{ padding: '1rem', width: '100%', marginBottom: '1.5rem', display: 'block', textAlign: 'center', borderColor: '#EF4444', color: '#EF4444' }}>{error}</div>}
         {msg && <div className="badge badge-ghost" style={{ padding: '1rem', width: '100%', marginBottom: '1.5rem', display: 'block', textAlign: 'center' }}>{msg}</div>}
 
-        <form onSubmit={handleAuth} className="flex-col gap-2">
-          {!isLogin && (
-            <div className="animate-fade-in stagger-2">
-              <div className="form-group mb-4">
-                <label className="form-label">I am a...</label>
-                <div className="flex gap-4" style={{ marginBottom: '0.5rem' }}>
-                  <label className="flex items-center gap-2" style={{ cursor: 'pointer' }}>
-                    <input type="radio" value="donor" checked={role === 'donor'} onChange={(e) => setRole(e.target.value)} /> Donor
-                  </label>
-                  <label className="flex items-center gap-2" style={{ cursor: 'pointer' }}>
-                    <input type="radio" value="acceptor" checked={role === 'acceptor'} onChange={(e) => setRole(e.target.value)} /> NGO
-                  </label>
-                </div>
-              </div>
-              <div className="form-group mb-4">
-                <label className="form-label">Full Name / Organization</label>
-                <input required type="text" className="form-input" value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. John Doe" />
-              </div>
-              <div className="form-group mb-4">
-                <label className="form-label">Mobile (Optional)</label>
-                <input type="tel" className="form-input" value={mobile} onChange={(e) => setMobile(e.target.value)} placeholder="e.g. +1 234 567 890" />
-              </div>
+        {isForgotPassword ? (
+          <form onSubmit={handleForgotPassword} className="flex-col gap-2">
+            <div className="form-group mb-4 animate-fade-in stagger-2">
+              <label className="form-label">Email</label>
+              <input required type="email" className="form-input" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="hello@example.com" />
             </div>
-          )}
 
-          <div className="form-group mb-4 animate-fade-in stagger-3">
-            <label className="form-label">Email</label>
-            <input required type="email" className="form-input" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="hello@example.com" />
-          </div>
+            <div className="animate-fade-in stagger-3" style={{ marginTop: '1rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              <button type="submit" className="btn btn-primary" disabled={loading}>
+                {loading ? 'Processing...' : 'Send Reset Link'}
+              </button>
+            </div>
+            
+            <div className="mt-6 text-center animate-fade-in stagger-4">
+              <button
+                type="button"
+                onClick={() => { setIsForgotPassword(false); setError(''); setMsg(''); }}
+                style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', textDecoration: 'underline', transition: 'color 0.2s', fontWeight: 600 }}
+                onMouseOver={(e) => e.target.style.color = 'var(--primary)'}
+                onMouseOut={(e) => e.target.style.color = 'var(--text-muted)'}
+              >
+                Back to Sign In
+              </button>
+            </div>
+          </form>
+        ) : (
+          <>
+            <form onSubmit={handleAuth} className="flex-col gap-2">
+              {!isLogin && (
+                <div className="animate-fade-in stagger-2">
+                  <div className="form-group mb-4">
+                    <label className="form-label">I am a...</label>
+                    <div className="flex gap-4" style={{ marginBottom: '0.5rem' }}>
+                      <label className="flex items-center gap-2" style={{ cursor: 'pointer' }}>
+                        <input type="radio" value="donor" checked={role === 'donor'} onChange={(e) => setRole(e.target.value)} /> Donor
+                      </label>
+                      <label className="flex items-center gap-2" style={{ cursor: 'pointer' }}>
+                        <input type="radio" value="acceptor" checked={role === 'acceptor'} onChange={(e) => setRole(e.target.value)} /> NGO
+                      </label>
+                    </div>
+                  </div>
+                  <div className="form-group mb-4">
+                    <label className="form-label">Full Name / Organization</label>
+                    <input required type="text" className="form-input" value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. John Doe" />
+                  </div>
+                  <div className="form-group mb-4">
+                    <label className="form-label">Mobile (Optional)</label>
+                    <input type="tel" className="form-input" value={mobile} onChange={(e) => setMobile(e.target.value)} placeholder="e.g. +1 234 567 890" />
+                  </div>
+                </div>
+              )}
 
-          <div className="form-group mb-4 animate-fade-in stagger-4">
-            <label className="form-label">Password</label>
-            <input required type="password" className="form-input" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Create a strong password" />
-          </div>
+              <div className="form-group mb-4 animate-fade-in stagger-3">
+                <label className="form-label">Email</label>
+                <input required type="email" className="form-input" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="hello@example.com" />
+              </div>
 
-          <div className="animate-fade-in stagger-5" style={{ marginTop: '1rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-            <button type="submit" className="btn btn-primary" disabled={loading}>
-              {loading ? 'Processing...' : (isLogin ? <><LogIn size={18} /> Sign In</> : <><UserPlus size={18} /> Create Account</>)}
-            </button>
-          </div>
-        </form>
+              <div className="form-group mb-2 animate-fade-in stagger-4">
+                <label className="form-label">Password</label>
+                <input required type="password" className="form-input" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Create a strong password" />
+              </div>
 
-        <div className="animate-fade-in stagger-5" style={{ marginTop: '1.5rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <div style={{ flex: 1, height: '1px', backgroundColor: 'var(--border)' }}></div>
-          <span style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>OR</span>
-          <div style={{ flex: 1, height: '1px', backgroundColor: 'var(--border)' }}></div>
-        </div>
+              {isLogin && (
+                <div className="animate-fade-in stagger-4 text-right mb-4">
+                  <button
+                    type="button"
+                    onClick={() => { setIsForgotPassword(true); setError(''); setMsg(''); }}
+                    style={{ background: 'none', border: 'none', color: 'var(--primary)', cursor: 'pointer', fontSize: '0.85rem', fontWeight: 600 }}
+                  >
+                    Forgot Password?
+                  </button>
+                </div>
+              )}
 
-        <div className="animate-fade-in stagger-5" style={{ marginTop: '1.5rem' }}>
-          <button
-            type="button"
-            onClick={handleGoogleLogin}
-            className="btn btn-secondary"
-            style={{ width: '100%', backgroundColor: '#fff', color: '#000', borderColor: '#ddd' }}
-            disabled={loading}
-          >
-            <GoogleIcon /> {isLogin ? 'Sign in with Google' : 'Sign up with Google'}
-          </button>
-        </div>
+              <div className="animate-fade-in stagger-5" style={{ marginTop: '0.5rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                <button type="submit" className="btn btn-primary" disabled={loading}>
+                  {loading ? 'Processing...' : (isLogin ? <><LogIn size={18} /> Sign In</> : <><UserPlus size={18} /> Create Account</>)}
+                </button>
+              </div>
+            </form>
+
+            <div className="animate-fade-in stagger-5" style={{ marginTop: '1.5rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
+              <div style={{ flex: 1, height: '1px', backgroundColor: 'var(--border)' }}></div>
+              <span style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>OR</span>
+              <div style={{ flex: 1, height: '1px', backgroundColor: 'var(--border)' }}></div>
+            </div>
+
+            <div className="animate-fade-in stagger-5" style={{ marginTop: '1.5rem' }}>
+              <button
+                type="button"
+                onClick={handleGoogleLogin}
+                className="btn btn-secondary"
+                style={{ width: '100%', backgroundColor: '#fff', color: '#000', borderColor: '#ddd' }}
+                disabled={loading}
+              >
+                <GoogleIcon /> {isLogin ? 'Sign in with Google' : 'Sign up with Google'}
+              </button>
+            </div>
+          </>
+        )}
 
         <div className="mt-8 text-center animate-fade-in stagger-5">
           <button
