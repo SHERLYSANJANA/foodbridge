@@ -24,23 +24,26 @@ export default function AddFoodComponent() {
     setSuccess('');
     setError('');
 
-    const { error: insertError } = await supabase
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      const { error: insertError } = await supabase
       .from('donations')
       .insert([
         {
+          donor_id: session?.user?.id,
           food_name: formData.food_name,
           quantity: parseInt(formData.quantity) || 0,
           location: formData.location.toLowerCase().trim(),
-          expiry_time: new Date(formData.expiry_time).toISOString(),
+          expiry_time: formData.expiry_time ? new Date(formData.expiry_time).toISOString() : null,
           food_type: formData.food_type
         }
       ]);
 
-    setLoading(false);
-    if (insertError) {
-      console.error(insertError);
-      setError('Failed to add food: ' + insertError.message);
-    } else {
+      if (insertError) {
+        throw insertError;
+      }
+      
       setSuccess('Food donation added successfully!');
       setFormData({
         food_name: '',
@@ -49,6 +52,11 @@ export default function AddFoodComponent() {
         expiry_time: '',
         food_type: 'veg'
       });
+    } catch (err) {
+      console.error(err);
+      setError('Failed to add food: ' + err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -76,8 +84,8 @@ export default function AddFoodComponent() {
           </div>
 
           <div className="form-group animate-fade-in stagger-4">
-            <label className="form-label">Expiry Time</label>
-            <input required type="datetime-local" name="expiry_time" className="form-input" value={formData.expiry_time} onChange={handleChange} />
+            <label className="form-label">Expiry Date (Optional)</label>
+            <input type="date" name="expiry_time" className="form-input" value={formData.expiry_time} onChange={handleChange} />
           </div>
 
           <div className="form-group animate-fade-in stagger-5">

@@ -23,10 +23,14 @@ export default function RequestFoodComponent() {
     setSuccess('');
     setError('');
 
-    const { error: insertError } = await supabase
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      const { error: insertError } = await supabase
       .from('requests')
       .insert([
         {
+          acceptor_id: session?.user?.id,
           food_name: formData.food_name.trim(),
           quantity: parseInt(formData.quantity) || 0,
           urgency: formData.urgency,
@@ -34,18 +38,22 @@ export default function RequestFoodComponent() {
         }
       ]);
 
-    setLoading(false);
-    if (insertError) {
-      console.error(insertError);
-      setError('Failed to request food: ' + insertError.message);
-    } else {
-      setSuccess('Food request submitted successfully!');
+      if (insertError) {
+        throw insertError;
+      }
+      
+      setSuccess('Request broadcasted successfully!');
       setFormData({
         food_name: '',
         quantity: '',
-        urgency: 'medium',
+        urgency: 'high',
         location: ''
       });
+    } catch (err) {
+      console.error(err);
+      setError('Failed to submit request: ' + err.message);
+    } finally {
+      setLoading(false);
     }
   };
 

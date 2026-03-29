@@ -48,7 +48,11 @@ export default function LiveMatchesComponent() {
   const handleRequestFood = async (donationId) => {
     setActionLoading(donationId);
     try {
+      const { data: userData } = await supabase.auth.getSession();
+      const acceptorId = userData.session.user.id;
+
       const { data: req, error: reqErr } = await supabase.from('requests').insert([{
+        acceptor_id: acceptorId,
         food_name: 'Direct Donation Request',
         quantity: 1,
         urgency: 'high',
@@ -128,18 +132,18 @@ export default function LiveMatchesComponent() {
                 const don = donations.find(d => d.id === m.donation_id);
                 if (!don) return null;
                 return (
-                  <div key={m.id} className="list-item" style={{borderColor: 'var(--text-main)'}}>
+                  <div key={m.id} className="list-item" style={{borderColor: 'var(--primary)'}}>
                     <div className="flex justify-between items-start mb-2">
                       <div>
                         <strong>NGO Request for {don.food_name}</strong>
                         <div className="text-muted text-sm mt-1 mb-3">Location Context: {don.location}</div>
-                        <span className="badge badge-outline" style={{borderColor: '#F59E0B', color: '#F59E0B'}}>Awaiting Your Review</span>
+                        <span className="badge badge-outline" style={{borderColor: '#D46A3D', color: '#D46A3D'}}>Awaiting Your Review</span>
                       </div>
                       <div className="flex flex-col gap-2">
-                        <button className="btn" style={{backgroundColor: '#10B981', color: '#fff', width: 'auto', padding: '0.5rem 1rem'}} onClick={() => handleUpdateMatch(m.id, 'accepted')} disabled={actionLoading === m.id}>
+                        <button className="btn" style={{backgroundColor: 'var(--secondary)', color: '#fff', width: 'auto', padding: '0.5rem 1rem'}} onClick={() => handleUpdateMatch(m.id, 'accepted')} disabled={actionLoading === m.id}>
                            Accept Delivery
                         </button>
-                        <button className="btn" style={{backgroundColor: 'transparent', color: '#EF4444', border: '1px solid #EF4444', width: 'auto', padding: '0.5rem 1rem'}} onClick={() => handleUpdateMatch(m.id, 'rejected')} disabled={actionLoading === m.id}>
+                        <button className="btn" style={{backgroundColor: 'transparent', color: 'var(--text-muted)', border: '1px solid var(--border)', width: 'auto', padding: '0.5rem 1rem'}} onClick={() => handleUpdateMatch(m.id, 'rejected')} disabled={actionLoading === m.id}>
                            Reject
                         </button>
                       </div>
@@ -153,7 +157,7 @@ export default function LiveMatchesComponent() {
         )}
 
         <div className="card animate-fade-in stagger-4">
-          <h2 className="section-title text-white"><span className="badge badge-solid">{matches.filter(m => m.status === 'accepted').length}</span> Active Transfers</h2>
+          <h2 className="section-title"><span className="badge badge-solid">{matches.filter(m => m.status === 'accepted').length}</span> Active Transfers</h2>
           <div className="flex-col gap-4 mt-4">
              {matches.filter(m => m.status === 'accepted').map((m) => {
                const don = donations.find(d => d.id === m.donation_id);
