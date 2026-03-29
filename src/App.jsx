@@ -113,11 +113,10 @@ function App() {
       setAuthRole(null);
 
       // Failsafe to manually wipe local storage if Supabase failed to clear it
-      for (let key in localStorage) {
-        if (key.startsWith("sb-") && key.endsWith("-auth-token")) {
-          localStorage.removeItem(key);
-        }
-      }
+      const supabaseKeys = Object.keys(localStorage).filter((key) =>
+        key.startsWith("sb-") && key.endsWith("-auth-token"),
+      );
+      supabaseKeys.forEach((key) => localStorage.removeItem(key));
       navigate("/");
     }
   };
