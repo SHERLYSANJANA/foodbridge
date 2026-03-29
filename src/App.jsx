@@ -14,6 +14,7 @@ import LiveMatchesComponent from "./components/LiveMatchesComponent";
 import VerificationComponent from "./components/VerificationComponent";
 import AuthComponent from "./components/AuthComponent";
 import LandingPageComponent from "./components/LandingPageComponent";
+import ViewAllListingsComponent from "./components/ViewAllListingsComponent";
 import { supabase } from "./supabaseClient";
 
 const BackgroundArt = () => null; // Removed old neon background art to match Figma's clean aesthetic
@@ -216,12 +217,20 @@ function App() {
               </Link>
             )}
             {isAcceptor && (
-              <Link
-                to="/"
-                className={`nav-link ${location.pathname === "/" ? "active" : ""}`}
-              >
-                <HeartHandshake size={20} /> Request Food
-              </Link>
+              <>
+                <Link
+                  to="/"
+                  className={`nav-link ${location.pathname === "/" ? "active" : ""}`}
+                >
+                  <HeartHandshake size={20} /> Request Food
+                </Link>
+                <Link
+                  to="/listings"
+                  className={`nav-link ${location.pathname === "/listings" ? "active" : ""}`}
+                >
+                  <ListOrdered size={20} /> View All Listings
+                </Link>
+              </>
             )}
             {session?.user?.user_metadata?.user_role === "donor" && (
               <Link
@@ -261,7 +270,32 @@ function App() {
       >
         <Routes>
           {!isAcceptor && <Route path="/" element={<AddFoodComponent />} />}
-          {isAcceptor && <Route path="/" element={<RequestFoodComponent onNavigateAuth={(mode) => { setAuthMode(mode || 'signin'); setShowAuth(true); }} />} />}
+          {isAcceptor && (
+            <Route
+              path="/"
+              element={
+                <RequestFoodComponent
+                  onNavigateAuth={(mode) => {
+                    setAuthMode(mode || "signin");
+                    setShowAuth(true);
+                  }}
+                />
+              }
+            />
+          )}
+          {isAcceptor && (
+            <Route
+              path="/listings"
+              element={
+                <ViewAllListingsComponent
+                  onNavigateAuth={(mode) => {
+                    setAuthMode(mode || "signin");
+                    setShowAuth(true);
+                  }}
+                />
+              }
+            />
+          )}
           <Route path="/verify-donor" element={<VerificationComponent />} />
         </Routes>
       </main>

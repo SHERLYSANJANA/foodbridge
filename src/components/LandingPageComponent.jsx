@@ -17,7 +17,7 @@ export default function LandingPageComponent({ onNavigateAuth }) {
         const { data, error } = await supabase
           .from("donations")
           .select(
-            "id, food_name, quantity, location, expiry_time, food_type, created_at",
+            "id, food_name, quantity, location, expiry_time, food_type, image_url, created_at",
           )
           .order("created_at", { ascending: false })
           .limit(8);
@@ -218,7 +218,21 @@ export default function LandingPageComponent({ onNavigateAuth }) {
                 : null;
               return (
                 <div className="preview-card" key={item.id}>
-                  <div className="preview-card-image-placeholder" />
+                  {item.image_url ? (
+                    <img
+                      src={item.image_url}
+                      alt={item.food_name}
+                      className="preview-card-image"
+                      style={{
+                        width: "100%",
+                        height: "150px",
+                        objectFit: "cover",
+                        borderRadius: "8px 8px 0 0",
+                      }}
+                    />
+                  ) : (
+                    <div className="preview-card-image-placeholder" />
+                  )}
                   <div className="preview-card-content">
                     <h3 className="preview-card-title">{item.food_name}</h3>
                     <p className="preview-card-meta">

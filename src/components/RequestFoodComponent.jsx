@@ -1,15 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { supabase } from "../supabaseClient";
 import { CheckCircle, AlertCircle } from "lucide-react";
 
-export default function RequestFoodComponent({ onNavigateAuth }) {
+export default function RequestFoodComponent() {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
-  const [listings, setListings] = useState([]);
-  const [loadingListings, setLoadingListings] = useState(true);
-  const [listingsError, setListingsError] = useState("");
-  const [orderMessage, setOrderMessage] = useState("");
   const [formData, setFormData] = useState({
     food_name: "",
     quantity: "",
@@ -232,6 +228,7 @@ export default function RequestFoodComponent({ onNavigateAuth }) {
           </button>
         </form>
       </div>
+<<<<<<< HEAD
 
       <section
         className="listings-preview-container animate-fade-in stagger-4"
@@ -313,6 +310,8 @@ export default function RequestFoodComponent({ onNavigateAuth }) {
           </div>
         )}
       </section>
+=======
+>>>>>>> 90964a55d787ab4b117ae05de9b0167f395cc2d2
     </div>
   );
 }
