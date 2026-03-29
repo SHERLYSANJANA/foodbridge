@@ -27,7 +27,6 @@ function App() {
   const [showAuth, setShowAuth] = useState(false);
   const [authMode, setAuthMode] = useState("signin"); // signin or signup
   const [authRole, setAuthRole] = useState(null); // donor or acceptor
-  const [isLight, setIsLight] = useState(false);
   const [verifiedStatus, setVerifiedStatus] = useState(null);
 
   useEffect(() => {
@@ -112,27 +111,9 @@ function App() {
       setAuthMode("signin");
       setAuthRole(null);
 
-      // Failsafe to manually wipe local storage if Supabase failed to clear it
-      const supabaseKeys = Object.keys(localStorage).filter((key) =>
-        key.startsWith("sb-") && key.endsWith("-auth-token"),
-      );
-      supabaseKeys.forEach((key) => localStorage.removeItem(key));
+      localStorage.clear()
       navigate("/");
     }
-  };
-
-  const toggleTheme = () => {
-    setIsLight((prev) => {
-      const next = !prev;
-      if (next) {
-        document.body.classList.add("light-mode");
-        localStorage.setItem("foodbridge-theme", "light");
-      } else {
-        document.body.classList.remove("light-mode");
-        localStorage.setItem("foodbridge-theme", "dark");
-      }
-      return next;
-    });
   };
 
   if (loading) {
