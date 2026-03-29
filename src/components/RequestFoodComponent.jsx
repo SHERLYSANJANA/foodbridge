@@ -1,15 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { supabase } from "../supabaseClient";
 import { CheckCircle, AlertCircle } from "lucide-react";
 
-export default function RequestFoodComponent({ onNavigateAuth }) {
+export default function RequestFoodComponent() {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
-  const [listings, setListings] = useState([]);
-  const [loadingListings, setLoadingListings] = useState(true);
-  const [listingsError, setListingsError] = useState("");
-  const [orderMessage, setOrderMessage] = useState("");
   const [formData, setFormData] = useState({
     food_name: "",
     quantity: "",
@@ -232,83 +228,6 @@ export default function RequestFoodComponent({ onNavigateAuth }) {
           </button>
         </form>
       </div>
-
-      <section
-        className="listings-preview-container animate-fade-in stagger-4"
-        style={{ marginTop: "2rem" }}
-      >
-        <h2 className="how-it-works-title">View All Listings</h2>
-        {orderMessage && (
-          <div
-            className="badge badge-ghost"
-            style={{ padding: "1rem", marginBottom: "1rem" }}
-          >
-            {orderMessage}
-          </div>
-        )}
-        {listingsError && (
-          <p style={{ color: "#EF4444", textAlign: "center" }}>
-            {listingsError}
-          </p>
-        )}
-        {loadingListings ? (
-          <p style={{ textAlign: "center", color: "var(--text-muted)" }}>
-            Loading listings...
-          </p>
-        ) : listings.length === 0 ? (
-          <p style={{ textAlign: "center", color: "var(--text-muted)" }}>
-            No food listings available.
-          </p>
-        ) : (
-          <div className="horizontal-scroll-wrapper">
-            {listings.map((item) => {
-              const now = new Date();
-              const exp = item.expiry_time ? new Date(item.expiry_time) : null;
-              const expiresIn = exp
-                ? Math.max(0, Math.floor((exp - now) / (1000 * 60)))
-                : null;
-              return (
-                <div className="preview-card" key={item.id}>
-                  <div className="preview-card-image-placeholder" />
-                  <div className="preview-card-content">
-                    <h3 className="preview-card-title">{item.food_name}</h3>
-                    <p className="preview-card-meta">
-                      {item.location || "Unknown location"} •{" "}
-                      {item.food_type?.toUpperCase()}
-                    </p>
-                    <div className="preview-card-stats">
-                      <span>
-                        {item.quantity
-                          ? `${item.quantity} portions`
-                          : "Quantity unknown"}
-                      </span>
-                      <span className="preview-card-urgency">
-                        {exp
-                          ? exp < now
-                            ? "Expired"
-                            : `Expires in ${Math.floor(expiresIn / 60)}h ${expiresIn % 60}m`
-                          : "No expiry set"}
-                      </span>
-                    </div>
-                    <div className="preview-tags">
-                      <span className="preview-tag">
-                        {item.food_type === "non-veg" ? "Non-Veg" : "Veg"}
-                      </span>
-                    </div>
-                    <button
-                      className="btn btn-primary"
-                      style={{ width: "100%", marginTop: "0.75rem" }}
-                      onClick={() => handleOrderNow(item)}
-                    >
-                      Order Food
-                    </button>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
-      </section>
     </div>
   );
 }
