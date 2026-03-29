@@ -30,7 +30,7 @@ export default function RequestFoodComponent({ onNavigateAuth }) {
         const { data, error } = await supabase
           .from("donations")
           .select(
-            "id, food_name, quantity, location, expiry_time, food_type, updated_at",
+            "id, food_name, quantity, location, expiry_time, food_type, updated_at, image_url",
           )
           .order("updated_at", { ascending: false })
           .limit(20);
@@ -269,7 +269,11 @@ export default function RequestFoodComponent({ onNavigateAuth }) {
                 : null;
               return (
                 <div className="preview-card" key={item.id}>
-                  <div className="preview-card-image-placeholder" />
+                  {item.image_url ? (
+                    <img src={item.image_url} alt={item.food_name} className="preview-card-image-placeholder" style={{ objectFit: "cover", width: "100%", height: "200px" }} />
+                  ) : (
+                    <div className="preview-card-image-placeholder" />
+                  )}
                   <div className="preview-card-content">
                     <h3 className="preview-card-title">{item.food_name}</h3>
                     <p className="preview-card-meta">

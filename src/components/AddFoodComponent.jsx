@@ -13,6 +13,7 @@ export default function AddFoodComponent() {
     expiry_time: '',
     food_type: 'veg'
   });
+  const [imageFile, setImageFile] = useState(null);
 
   const handleChange = (e) => {
     setFormData({...formData, [e.target.name]: e.target.value});
@@ -27,7 +28,7 @@ export default function AddFoodComponent() {
     try {
       const { data: { session } } = await supabase.auth.getSession();
       
-      const { error: insertError } = await supabase
+      const { data, error: insertError } = await supabase
       .from('donations')
       .insert([
         {
@@ -38,10 +39,30 @@ export default function AddFoodComponent() {
           expiry_time: formData.expiry_time ? new Date(formData.expiry_time).toISOString() : null,
           food_type: formData.food_type
         }
-      ]);
+      ]).select('*');
 
-      if (insertError) {
-        throw insertError;
+      if (insertError) throw insertError;
+      const newDonationId = data?.[0]?.id;
+
+      let fileUrl = null;
+      if (imageFile && newDonationId) {
+        setLoading(true);
+        const fileExt = imageFile.name.split('.').pop();
+        const fileName = `${newDonationId}-${Date.now()}.${fileExt}`;
+        const { error: uploadError } = await supabase.storage
+          .from('food-images')
+          .upload(fileName, imageFile);
+
+        if (!uploadError) {
+          const { data: publicData } = supabase.storage
+            .from('food-images')
+            .getPublicUrl(fileName);
+          fileUrl = publicData?.publicUrl;
+
+          await supabase.from('donations')
+            .update({ image_url: fileUrl })
+            .eq('id', newDonationId);
+        }
       }
       
       setSuccess('Food donation added successfully!');
@@ -52,6 +73,8 @@ export default function AddFoodComponent() {
         expiry_time: '',
         food_type: 'veg'
       });
+      setImageFile(null);
+      document.getElementById('food-image-upload').value = '';
     } catch (err) {
       console.error(err);
       setError('Failed to add food: ' + err.message);
@@ -94,6 +117,11 @@ export default function AddFoodComponent() {
               <option value="veg">Vegetarian</option>
               <option value="non-veg">Non-Vegetarian</option>
             </select>
+          </div>
+
+          <div className="form-group animate-fade-in stagger-5">
+            <label className="form-label">Upload Picture (Optional)</label>
+            <input id="food-image-upload" type="file" accept="image/*" className="form-input" onChange={(e) => setImageFile(e.target.files?.[0])} />
           </div>
 
           <button type="submit" className="btn btn-primary mt-4" disabled={loading}>
