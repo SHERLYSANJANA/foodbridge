@@ -29,15 +29,15 @@ const GoogleIcon = () => (
   </svg>
 );
 
-export default function AuthComponent({ initialMode = "signin" }) {
+export default function AuthComponent({ initialMode = "signin", initialRole = null }) {
   const [isLogin, setIsLogin] = useState(initialMode !== "signup");
   const [isForgotPassword, setIsForgotPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [msg, setMsg] = useState("");
 
-  const [signUpStep, setSignUpStep] = useState(0); // 0: role selection, 1: basic, 2: details, 3: verify
-  const [selectedRole, setSelectedRole] = useState("donor");
+  const [signUpStep, setSignUpStep] = useState(initialRole ? 1 : 0); // 0: role selection, 1: basic, 2: details, 3: verify
+  const [selectedRole, setSelectedRole] = useState(initialRole || "donor");
   const [showPassword, setShowPassword] = useState(false);
   const [agreed, setAgreed] = useState(false);
   const [verified, setVerified] = useState(false);
@@ -73,8 +73,8 @@ export default function AuthComponent({ initialMode = "signin" }) {
   };
 
   const resetForm = () => {
-    setSignUpStep(0);
-    setSelectedRole("donor");
+    setSignUpStep(initialRole ? 1 : 0);
+    setSelectedRole(initialRole || "donor");
     setFullName("");
     setEmail("");
     setPassword("");

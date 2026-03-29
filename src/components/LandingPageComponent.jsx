@@ -99,13 +99,13 @@ export default function LandingPageComponent({ onNavigateAuth }) {
         <div className="hero-buttons">
           <button
             className="btn btn-primary"
-            onClick={() => onNavigateAuth("signup")}
+            onClick={() => onNavigateAuth("signup", "donor")}
           >
             I Want to Donate Food
           </button>
           <button
             className="btn btn-secondary"
-            onClick={() => onNavigateAuth("signup")}
+            onClick={() => onNavigateAuth("signup", "acceptor")}
           >
             I Need Food
           </button>

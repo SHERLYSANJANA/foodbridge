@@ -26,6 +26,7 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [showAuth, setShowAuth] = useState(false);
   const [authMode, setAuthMode] = useState("signin"); // signin or signup
+  const [authRole, setAuthRole] = useState(null); // donor or acceptor
   const [isLight, setIsLight] = useState(false);
   const [verifiedStatus, setVerifiedStatus] = useState(null);
 
@@ -109,6 +110,7 @@ function App() {
       setVerifiedStatus(null);
       setShowAuth(false);
       setAuthMode("signin");
+      setAuthRole(null);
 
       // Failsafe to manually wipe local storage if Supabase failed to clear it
       for (let key in localStorage) {
@@ -174,13 +176,14 @@ function App() {
                 Back to Home
               </button>
             </div>
-            <AuthComponent initialMode={authMode} />
+            <AuthComponent initialMode={authMode} initialRole={authRole} />
           </div>
         ) : (
           <div style={{ width: "100vw", zIndex: 10 }}>
             <LandingPageComponent
-              onNavigateAuth={(mode) => {
+              onNavigateAuth={(mode, role) => {
                 setAuthMode(mode || "signup");
+                setAuthRole(role || null);
                 setShowAuth(true);
               }}
             />
