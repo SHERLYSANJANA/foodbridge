@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Routes, Route, Link, useLocation } from 'react-router-dom';
-import { Home, Utensils, HeartHandshake, ListOrdered, LogOut } from 'lucide-react';
+import { Home, Utensils, HeartHandshake, ListOrdered, LogOut, Sun, Moon } from 'lucide-react';
 import AddFoodComponent from './components/AddFoodComponent';
 import RequestFoodComponent from './components/RequestFoodComponent';
 import LiveMatchesComponent from './components/LiveMatchesComponent';
@@ -13,8 +13,15 @@ function App() {
   const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showAuth, setShowAuth] = useState(false);
+  const [isLight, setIsLight] = useState(false);
 
   useEffect(() => {
+    const saved = localStorage.getItem('foodbridge-theme');
+    if (saved === 'light') {
+      setIsLight(true);
+      document.body.classList.add('light-mode');
+    }
+
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setLoading(false);
@@ -32,6 +39,20 @@ function App() {
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
+  };
+
+  const toggleTheme = () => {
+    setIsLight(prev => {
+      const next = !prev;
+      if (next) {
+        document.body.classList.add('light-mode');
+        localStorage.setItem('foodbridge-theme', 'light');
+      } else {
+        document.body.classList.remove('light-mode');
+        localStorage.setItem('foodbridge-theme', 'dark');
+      }
+      return next;
+    });
   };
 
   if (loading) {
@@ -62,9 +83,14 @@ function App() {
                 <Utensils size={28} />
                 FoodBridge
               </div>
-              <button className="btn btn-secondary" style={{ width: 'auto', padding: '0.5rem 1.5rem', borderRadius: '99px' }} onClick={() => setShowAuth(true)}>
-                Sign In
-              </button>
+              <div className="flex gap-4 items-center">
+                <button className="btn btn-secondary" style={{ width: 'auto', padding: '0.65rem', borderRadius: '50%' }} onClick={toggleTheme}>
+                  {isLight ? <Moon size={18} /> : <Sun size={18} />}
+                </button>
+                <button className="btn btn-secondary" style={{ width: 'auto', padding: '0.5rem 1.5rem', borderRadius: '99px' }} onClick={() => setShowAuth(true)}>
+                  Sign In
+                </button>
+              </div>
             </div>
             <LandingPageComponent onNavigateAuth={() => setShowAuth(true)} />
           </div>
@@ -103,7 +129,10 @@ function App() {
           </div>
         </div>
         
-        <div style={{ marginTop: 'auto', paddingTop: '2rem' }} className="animate-fade-in stagger-2">
+        <div style={{ marginTop: 'auto', paddingTop: '2rem' }} className="animate-fade-in stagger-2 flex-col gap-2">
+           <button onClick={toggleTheme} className="btn btn-secondary" style={{ justifyContent: 'flex-start' }}>
+             {isLight ? <><Moon size={18} /> Dark Mode</> : <><Sun size={18} /> Light Mode</>}
+           </button>
            <button onClick={handleSignOut} className="btn btn-secondary" style={{ justifyContent: 'flex-start' }}>
              <LogOut size={18} /> Sign Out
            </button>
