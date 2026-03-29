@@ -53,34 +53,34 @@ export default function AddFoodComponent() {
   };
 
   return (
-    <div>
+    <div className="animate-fade-in stagger-1">
       <h1 className="page-title">Donate Surplus Food</h1>
-      <div className="card" style={{ maxWidth: '600px', margin: '0 auto' }}>
-        {success && <div className="badge" style={{ backgroundColor: 'rgba(16,185,129,0.2)', color: '#10B981', padding: '1rem', width: '100%', marginBottom: '1rem', display: 'flex', gap: '8px' }}><CheckCircle size={18}/> {success}</div>}
-        {error && <div className="badge" style={{ backgroundColor: 'rgba(239,68,68,0.2)', color: '#EF4444', padding: '1rem', width: '100%', marginBottom: '1rem', display: 'flex', gap: '8px' }}><AlertCircle size={18}/> {error}</div>}
+      <div className="card animate-fade-in stagger-2" style={{ maxWidth: '600px' }}>
+        {success && <div className="badge badge-ghost" style={{ padding: '1.25rem', width: '100%', marginBottom: '1.5rem', display: 'flex', gap: '10px' }}><CheckCircle size={18}/> {success}</div>}
+        {error && <div className="badge badge-outline" style={{ padding: '1.25rem', width: '100%', marginBottom: '1.5rem', display: 'flex', gap: '10px' }}><AlertCircle size={18}/> {error}</div>}
 
         <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label className="form-label">Food Description/Name</label>
+          <div className="form-group animate-fade-in stagger-1">
+            <label className="form-label">Food Description</label>
             <input required type="text" name="food_name" className="form-input" placeholder="e.g. 5 boxes of pasta" value={formData.food_name} onChange={handleChange} />
           </div>
 
-          <div className="form-group">
-            <label className="form-label">Quantity (approx. meals/servings)</label>
-            <input required type="number" min="1" name="quantity" className="form-input" placeholder="e.g. 20" value={formData.quantity} onChange={handleChange} />
+          <div className="form-group animate-fade-in stagger-2">
+            <label className="form-label">Quantity</label>
+            <input required type="number" min="1" name="quantity" className="form-input" placeholder="e.g. 20 (meals)" value={formData.quantity} onChange={handleChange} />
           </div>
 
-          <div className="form-group">
-            <label className="form-label">Location (e.g. Downtown, ZIP, or City)</label>
-            <input required type="text" name="location" className="form-input" placeholder="e.g. New York City" value={formData.location} onChange={handleChange} />
+          <div className="form-group animate-fade-in stagger-3">
+            <label className="form-label">Location</label>
+            <input required type="text" name="location" className="form-input" placeholder="e.g. Downtown" value={formData.location} onChange={handleChange} />
           </div>
 
-          <div className="form-group">
+          <div className="form-group animate-fade-in stagger-4">
             <label className="form-label">Expiry Time</label>
             <input required type="datetime-local" name="expiry_time" className="form-input" value={formData.expiry_time} onChange={handleChange} />
           </div>
 
-          <div className="form-group">
+          <div className="form-group animate-fade-in stagger-5">
             <label className="form-label">Food Type</label>
             <select name="food_type" className="form-select" value={formData.food_type} onChange={handleChange}>
               <option value="veg">Vegetarian</option>
@@ -88,8 +88,8 @@ export default function AddFoodComponent() {
             </select>
           </div>
 
-          <button type="submit" className="btn btn-primary" disabled={loading}>
-            {loading ? 'Adding...' : 'Add Food Donation'}
+          <button type="submit" className="btn btn-primary mt-4" disabled={loading}>
+            {loading ? 'Processing...' : 'Add Food Donation'}
           </button>
         </form>
       </div>

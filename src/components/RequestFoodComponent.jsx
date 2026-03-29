@@ -7,13 +7,14 @@ export default function RequestFoodComponent() {
   const [success, setSuccess] = useState('');
   const [error, setError] = useState('');
   const [formData, setFormData] = useState({
-    quantity_needed: '',
-    location: '',
-    urgency: 'medium'
+    food_name: '',
+    quantity: '',
+    urgency: 'medium',
+    location: ''
   });
 
   const handleChange = (e) => {
-    setFormData({...formData, [e.target.name]: e.target.value});
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e) => {
@@ -26,9 +27,10 @@ export default function RequestFoodComponent() {
       .from('requests')
       .insert([
         {
-          quantity_needed: parseInt(formData.quantity_needed) || 0,
-          location: formData.location.toLowerCase().trim(),
-          urgency: formData.urgency
+          food_name: formData.food_name.trim(),
+          quantity: parseInt(formData.quantity) || 0,
+          urgency: formData.urgency,
+          location: formData.location.trim()
         }
       ]);
 
@@ -39,41 +41,47 @@ export default function RequestFoodComponent() {
     } else {
       setSuccess('Food request submitted successfully!');
       setFormData({
-        quantity_needed: '',
-        location: '',
-        urgency: 'medium'
+        food_name: '',
+        quantity: '',
+        urgency: 'medium',
+        location: ''
       });
     }
   };
 
   return (
-    <div>
+    <div className="animate-fade-in stagger-1">
       <h1 className="page-title">Request Surplus Food</h1>
-      <div className="card" style={{ maxWidth: '600px', margin: '0 auto' }}>
-        {success && <div className="badge" style={{ backgroundColor: 'rgba(59,130,246,0.2)', color: '#3B82F6', padding: '1rem', width: '100%', marginBottom: '1rem', display: 'flex', gap: '8px' }}><CheckCircle size={18}/> {success}</div>}
-        {error && <div className="badge" style={{ backgroundColor: 'rgba(239,68,68,0.2)', color: '#EF4444', padding: '1rem', width: '100%', marginBottom: '1rem', display: 'flex', gap: '8px' }}><AlertCircle size={18}/> {error}</div>}
+      <div className="card animate-fade-in stagger-2" style={{ maxWidth: '600px' }}>
+        {success && <div className="badge badge-ghost" style={{ padding: '1.25rem', width: '100%', marginBottom: '1.5rem', display: 'flex', gap: '10px' }}><CheckCircle size={18} /> {success}</div>}
+        {error && <div className="badge badge-outline" style={{ padding: '1.25rem', width: '100%', marginBottom: '1.5rem', display: 'flex', gap: '10px' }}><AlertCircle size={18} /> {error}</div>}
 
         <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label className="form-label">Quantity Needed (meals/servings)</label>
-            <input required type="number" min="1" name="quantity_needed" className="form-input" placeholder="e.g. 50" value={formData.quantity_needed} onChange={handleChange} />
+          <div className="form-group animate-fade-in stagger-1">
+            <label className="form-label">Food Request Description</label>
+            <input required type="text" name="food_name" className="form-input" placeholder="e.g. Bread, Pasta, etc." value={formData.food_name} onChange={handleChange} />
           </div>
 
-          <div className="form-group">
-            <label className="form-label">Location (e.g. Downtown, ZIP, or City)</label>
-            <input required type="text" name="location" className="form-input" placeholder="e.g. New York City" value={formData.location} onChange={handleChange} />
+          <div className="form-group animate-fade-in stagger-2">
+            <label className="form-label">Target Quantity</label>
+            <input required type="number" min="1" name="quantity" className="form-input" placeholder="e.g. 50 (meals)" value={formData.quantity} onChange={handleChange} />
           </div>
 
-          <div className="form-group">
-            <label className="form-label">Urgency</label>
+          <div className="form-group animate-fade-in stagger-3">
+            <label className="form-label">Location Identifier</label>
+            <input required type="text" name="location" className="form-input" placeholder="e.g. ZIP code or City" value={formData.location} onChange={handleChange} />
+          </div>
+
+          <div className="form-group animate-fade-in stagger-4">
+            <label className="form-label">Urgency Level</label>
             <select name="urgency" className="form-select" value={formData.urgency} onChange={handleChange}>
-              <option value="low">Low (within next day)</option>
-              <option value="medium">Medium (within 6-12 hours)</option>
-              <option value="high">High (Immediate, next 1-2 hours)</option>
+              <option value="low">Low (Standard)</option>
+              <option value="medium">Medium (Moderate Need)</option>
+              <option value="high">High (Immediate)</option>
             </select>
           </div>
 
-          <button type="submit" className="btn btn-secondary" disabled={loading}>
+          <button type="submit" className="btn btn-secondary mt-4" disabled={loading}>
             {loading ? 'Submitting...' : 'Submit Request'}
           </button>
         </form>
