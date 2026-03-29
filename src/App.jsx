@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { Routes, Route, Link, useLocation } from 'react-router-dom';
-import { Home, Utensils, HeartHandshake, ListOrdered, LogOut, Sun, Moon, Coffee, Leaf, Pizza, Apple, Carrot, Cherry, Cake, IceCream, Beef } from 'lucide-react';
+import { Home, Utensils, HeartHandshake, ListOrdered, LogOut, Sun, Moon, Coffee, Leaf, Pizza, Apple, Carrot, Cherry, Cake, IceCream, Beef, ShieldCheck } from 'lucide-react';
 import AddFoodComponent from './components/AddFoodComponent';
 import RequestFoodComponent from './components/RequestFoodComponent';
 import LiveMatchesComponent from './components/LiveMatchesComponent';
+import VerificationComponent from './components/VerificationComponent';
 import AuthComponent from './components/AuthComponent';
 import LandingPageComponent from './components/LandingPageComponent';
 import { supabase } from './supabaseClient';
@@ -46,6 +47,7 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [showAuth, setShowAuth] = useState(false);
   const [isLight, setIsLight] = useState(false);
+  const [verifiedStatus, setVerifiedStatus] = useState(null);
 
   useEffect(() => {
     const savedTheme = localStorage.getItem('foodbridge-theme');
@@ -54,40 +56,36 @@ function App() {
       document.body.classList.add('light-mode');
     }
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
+    const fetchSessionAndStatus = async () => {
+      const { data: { session: currentSession } } = await supabase.auth.getSession();
+      setSession(currentSession);
+      
+      if (currentSession) {
+        const { data } = await supabase.from('verification_requests').select('status').eq('donor_id', currentSession.user.id).order('created_at', { ascending: false }).limit(1);
+        if (data && data.length > 0) {
+          setVerifiedStatus(data[0].status);
+        }
+      }
       setLoading(false);
-    });
+    };
 
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-      if (session) setShowAuth(false);
+    fetchSessionAndStatus();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, newSession) => {
+      setSession(newSession);
+      if (newSession) {
+        const { data } = await supabase.from('verification_requests').select('status').eq('donor_id', newSession.user.id).order('created_at', { ascending: false }).limit(1);
+        if (data && data.length > 0) setVerifiedStatus(data[0].status);
+      } else {
+        setVerifiedStatus(null);
+      }
     });
 
     return () => subscription.unsubscribe();
   }, []);
 
   const handleSignOut = async () => {
-    if (session?.isGuest) {
-      setSession(null);
-      return;
-    }
     await supabase.auth.signOut();
-  };
-
-  const handleGuestLogin = (role) => {
-    setSession({
-      isGuest: true,
-      user: {
-        user_metadata: {
-          user_role: role,
-          full_name: 'Guest Tester'
-        }
-      }
-    });
-    setShowAuth(false);
   };
 
   const toggleTheme = () => {
@@ -124,7 +122,7 @@ function App() {
                 Back to Home
               </button>
             </div>
-            <AuthComponent onGuestLogin={handleGuestLogin} />
+            <AuthComponent />
           </div>
         ) : (
           <div style={{ width: '100vw', zIndex: 10 }}>
@@ -160,8 +158,8 @@ function App() {
       <aside className="sidebar">
         <div>
           <Link to="/" className="brand">
-            <Utensils size={28} />
-            FoodBridge
+            <Utensils size={24} /> FoodBridge
+            {verifiedStatus === 'approved' && <ShieldCheck size={18} color="#10B981" style={{marginLeft: '0.4rem'}} title="Verified Donor" />}
           </Link>
           <div className="nav-links animate-fade-in stagger-1">
             {!isAcceptor && (
@@ -175,8 +173,13 @@ function App() {
               </Link>
             )}
             <Link to="/matches" className={`nav-link ${location.pathname === '/matches' ? 'active' : ''}`}>
-              <ListOrdered size={20} /> Live Matches
+              <HeartHandshake size={20} /> Match Dashboard
             </Link>
+            {session?.user?.user_metadata?.user_role === 'donor' && (
+              <Link to="/verify-donor" className={`nav-link ${location.pathname === '/verify-donor' ? 'active' : ''}`}>
+                <ShieldCheck size={20} /> Verify Account
+              </Link>
+            )}
           </div>
         </div>
 
@@ -196,6 +199,7 @@ function App() {
           {!isAcceptor && <Route path="/" element={<AddFoodComponent />} />}
           {isAcceptor && <Route path="/" element={<RequestFoodComponent />} />}
           <Route path="/matches" element={<LiveMatchesComponent />} />
+          <Route path="/verify-donor" element={<VerificationComponent />} />
         </Routes>
       </main>
     </div>

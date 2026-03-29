@@ -135,9 +135,6 @@ export default function AuthComponent() {
             <button type="submit" className="btn btn-primary" disabled={loading}>
               {loading ? 'Processing...' : (isLogin ? <><LogIn size={18} /> Sign In</> : <><UserPlus size={18} /> Create Account</>)}
             </button>
-            <button type="button" onClick={() => onGuestLogin(role)} className="btn btn-secondary" style={{ borderStyle: 'dashed' }}>
-              Bypass Login (Dev Mode)
-            </button>
           </div>
         </form>
 

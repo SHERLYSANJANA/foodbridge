@@ -73,11 +73,11 @@ export default function RequestFoodComponent() {
           </div>
 
           <div className="form-group animate-fade-in stagger-4">
-            <label className="form-label">Urgency Level</label>
+            <label className="form-label">Urgency Level & Timeframe</label>
             <select name="urgency" className="form-select" value={formData.urgency} onChange={handleChange}>
-              <option value="low">Low (Standard)</option>
-              <option value="medium">Medium (Moderate Need)</option>
-              <option value="high">High (Immediate)</option>
+              <option value="low">Low (Needed within 24 hours)</option>
+              <option value="medium">Medium (Needed within 12 hours)</option>
+              <option value="high">High (Immediate, &lt; 2 hours)</option>
             </select>
           </div>
 
