@@ -38,7 +38,24 @@ function App() {
   }, []);
 
   const handleSignOut = async () => {
+    if (session?.isGuest) {
+      setSession(null);
+      return;
+    }
     await supabase.auth.signOut();
+  };
+
+  const handleGuestLogin = (role) => {
+    setSession({
+      isGuest: true,
+      user: {
+        user_metadata: {
+          user_role: role,
+          full_name: 'Guest Tester'
+        }
+      }
+    });
+    setShowAuth(false);
   };
 
   const toggleTheme = () => {
@@ -74,7 +91,7 @@ function App() {
                 Back to Home
               </button>
             </div>
-            <AuthComponent />
+            <AuthComponent onGuestLogin={handleGuestLogin} />
           </div>
         ) : (
           <div style={{ width: '100vw' }}>

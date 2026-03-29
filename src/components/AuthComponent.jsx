@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { supabase } from '../supabaseClient';
 import { LogIn, UserPlus } from 'lucide-react';
 
-export default function AuthComponent() {
+export default function AuthComponent({ onGuestLogin }) {
   const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -95,9 +95,12 @@ export default function AuthComponent() {
             <input required type="password" className="form-input" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Create a strong password" />
           </div>
 
-          <div className="animate-fade-in stagger-5" style={{ marginTop: '1rem' }}>
+          <div className="animate-fade-in stagger-5" style={{ marginTop: '1rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
             <button type="submit" className="btn btn-primary" disabled={loading}>
               {loading ? 'Processing...' : (isLogin ? <><LogIn size={18}/> Sign In</> : <><UserPlus size={18}/> Create Account</>)}
+            </button>
+            <button type="button" onClick={() => onGuestLogin(role)} className="btn btn-secondary" style={{ borderStyle: 'dashed' }}>
+              Bypass Login (Dev Mode)
             </button>
           </div>
         </form>
