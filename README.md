@@ -1,6 +1,6 @@
 1. NEED FOR FOOD: Real-Time Surplus Food Redistribution Platform 
 Bridging the gap between food surplus and community need through real-time logistics.
-[ [Watch Demo Video] (https://drive.google.com/file/d/1MzZdQn4kDX639cQMEgLLBV2XP-Bsr2f1/view?usp=drive_link)] 
+[ [Watch Demo Video] (https://drive.google.com/file/d/1MzZdQn4kDX639cQMEgLLBV2XP-Bsr2f1/view?usp=sharing)] 
 
 2. PROBLEM STATEMENT
 NEED FOR FOOD: Real-Time Surplus Food Redistribution Platform 
