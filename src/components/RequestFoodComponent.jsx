@@ -23,39 +23,29 @@ export default function RequestFoodComponent() {
     setSuccess('');
     setError('');
 
-    try {
-      const foodNameVal = formData.food_name ? formData.food_name.trim() : 'Unknown';
-      const locationVal = formData.location ? formData.location.trim() : 'Unknown';
-      const quantityVal = parseInt(formData.quantity) || 1;
+    const { error: insertError } = await supabase
+      .from('requests')
+      .insert([
+        {
+          food_name: formData.food_name.trim(),
+          quantity: parseInt(formData.quantity) || 0,
+          urgency: formData.urgency,
+          location: formData.location.trim()
+        }
+      ]);
 
-      const { data, error: insertError } = await supabase
-        .from('requests')
-        .insert([
-          {
-            food_name: foodNameVal,
-            quantity: quantityVal,
-            urgency: formData.urgency,
-            location: locationVal
-          }
-        ])
-        .select();
-
-      if (insertError) {
-        throw insertError;
-      }
-
-      setSuccess(`Food request submitted successfully (ID: ${data[0]?.id})`);
+    setLoading(false);
+    if (insertError) {
+      console.error(insertError);
+      setError('Failed to request food: ' + insertError.message);
+    } else {
+      setSuccess('Food request submitted successfully!');
       setFormData({
         food_name: '',
         quantity: '',
         urgency: 'medium',
         location: ''
       });
-    } catch (err) {
-      console.error("Submission Error:", err);
-      setError(err.message || 'An unexpected error occurred while requesting food.');
-    } finally {
-      setLoading(false);
     }
   };
 

@@ -24,39 +24,24 @@ export default function AddFoodComponent() {
     setSuccess('');
     setError('');
 
-    try {
-      // Validate inputs safely
-      const locationVal = formData.location ? formData.location.toLowerCase().trim() : 'unspecified';
-      const quantityVal = parseInt(formData.quantity) || 1;
-      
-      let expiryTimeISO = null;
-      if (formData.expiry_time) {
-        const d = new Date(formData.expiry_time);
-        if (!isNaN(d.getTime())) {
-          expiryTimeISO = d.toISOString();
-        } else {
-          throw new Error("Invalid expiry time provided.");
+    const { error: insertError } = await supabase
+      .from('donations')
+      .insert([
+        {
+          food_name: formData.food_name,
+          quantity: parseInt(formData.quantity) || 0,
+          location: formData.location.toLowerCase().trim(),
+          expiry_time: new Date(formData.expiry_time).toISOString(),
+          food_type: formData.food_type
         }
-      }
+      ]);
 
-      const { data, error: insertError } = await supabase
-        .from('donations')
-        .insert([
-          {
-            food_name: formData.food_name,
-            quantity: quantityVal,
-            location: locationVal,
-            expiry_time: expiryTimeISO,
-            food_type: formData.food_type
-          }
-        ])
-        .select();
-
-      if (insertError) {
-        throw insertError;
-      }
-
-      setSuccess(`Donation added successfully (ID: ${data[0]?.id})`);
+    setLoading(false);
+    if (insertError) {
+      console.error(insertError);
+      setError('Failed to add food: ' + insertError.message);
+    } else {
+      setSuccess('Food donation added successfully!');
       setFormData({
         food_name: '',
         quantity: '',
@@ -64,11 +49,6 @@ export default function AddFoodComponent() {
         expiry_time: '',
         food_type: 'veg'
       });
-    } catch (err) {
-      console.error("Submission Error:", err);
-      setError(err.message || 'An unexpected error occurred while adding food.');
-    } finally {
-      setLoading(false);
     }
   };
 

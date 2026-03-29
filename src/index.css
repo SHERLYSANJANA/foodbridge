@@ -16,22 +16,6 @@
   --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.8);
 }
 
-.light-mode {
-  --bg: #FFFFFF;
-  --bg-card: #F9F9F9;
-  --bg-glass: rgba(0, 0, 0, 0.02);
-  --bg-glass-hover: rgba(0, 0, 0, 0.05);
-  --border: #E5E5E5;
-  --border-focus: #000000;
-  --text-main: #000000;
-  --text-muted: #666666;
-  --text-dark: #FFFFFF; 
-  --white: #000000;     
-  
-  --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.1);
-}
-
 * {
   box-sizing: border-box;
   margin: 0;

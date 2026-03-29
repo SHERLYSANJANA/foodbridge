@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Routes, Route, Link, useLocation } from 'react-router-dom';
-import { Home, Utensils, HeartHandshake, ListOrdered, LogOut, Sun, Moon } from 'lucide-react';
+import { Home, Utensils, HeartHandshake, ListOrdered, LogOut } from 'lucide-react';
 import AddFoodComponent from './components/AddFoodComponent';
 import RequestFoodComponent from './components/RequestFoodComponent';
 import LiveMatchesComponent from './components/LiveMatchesComponent';
@@ -13,15 +13,8 @@ function App() {
   const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showAuth, setShowAuth] = useState(false);
-  const [isLight, setIsLight] = useState(false);
 
   useEffect(() => {
-    const saved = localStorage.getItem('foodbridge-theme');
-    if (saved === 'light') {
-      setIsLight(true);
-      document.body.classList.add('light-mode');
-    }
-
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setLoading(false);
@@ -45,19 +38,6 @@ function App() {
     await supabase.auth.signOut();
   };
 
-  const handleGuestLogin = (role) => {
-    setSession({
-      isGuest: true,
-      user: {
-        user_metadata: {
-          user_role: role,
-          full_name: 'Guest Tester'
-        }
-      }
-    });
-    setShowAuth(false);
-  };
-
   const toggleTheme = () => {
     setIsLight(prev => {
       const next = !prev;
@@ -73,7 +53,7 @@ function App() {
   };
 
   if (loading) {
-    return <div className="app-container flex items-center justify-center text-muted" style={{minHeight: '100vh'}}>Loading...</div>;
+    return <div className="app-container flex items-center justify-center text-muted" style={{ minHeight: '100vh' }}>Loading...</div>;
   }
 
   // Unauthenticated State (Hero or Auth)
@@ -100,14 +80,9 @@ function App() {
                 <Utensils size={28} />
                 FoodBridge
               </div>
-              <div className="flex gap-4 items-center">
-                <button className="btn btn-secondary" style={{ width: 'auto', padding: '0.65rem', borderRadius: '50%' }} onClick={toggleTheme}>
-                  {isLight ? <Moon size={18} /> : <Sun size={18} />}
-                </button>
-                <button className="btn btn-secondary" style={{ width: 'auto', padding: '0.5rem 1.5rem', borderRadius: '99px' }} onClick={() => setShowAuth(true)}>
-                  Sign In
-                </button>
-              </div>
+              <button className="btn btn-secondary" style={{ width: 'auto', padding: '0.5rem 1.5rem', borderRadius: '99px' }} onClick={() => setShowAuth(true)}>
+                Sign In
+              </button>
             </div>
             <LandingPageComponent onNavigateAuth={() => setShowAuth(true)} />
           </div>
@@ -131,33 +106,30 @@ function App() {
           </Link>
           <div className="nav-links animate-fade-in stagger-1">
             {!isAcceptor && (
-               <Link to="/" className={`nav-link ${location.pathname === '/' ? 'active' : ''}`}>
-                 <Home size={20} /> Add Food
-               </Link>
+              <Link to="/" className={`nav-link ${location.pathname === '/' ? 'active' : ''}`}>
+                <Home size={20} /> Add Food
+              </Link>
             )}
             {isAcceptor && (
-               <Link to="/" className={`nav-link ${location.pathname === '/' ? 'active' : ''}`}>
-                 <HeartHandshake size={20} /> Request Food
-               </Link>
+              <Link to="/" className={`nav-link ${location.pathname === '/' ? 'active' : ''}`}>
+                <HeartHandshake size={20} /> Request Food
+              </Link>
             )}
             <Link to="/matches" className={`nav-link ${location.pathname === '/matches' ? 'active' : ''}`}>
               <ListOrdered size={20} /> Live Matches
             </Link>
           </div>
         </div>
-        
-        <div style={{ marginTop: 'auto', paddingTop: '2rem' }} className="animate-fade-in stagger-2 flex-col gap-2">
-           <button onClick={toggleTheme} className="btn btn-secondary" style={{ justifyContent: 'flex-start' }}>
-             {isLight ? <><Moon size={18} /> Dark Mode</> : <><Sun size={18} /> Light Mode</>}
-           </button>
-           <button onClick={handleSignOut} className="btn btn-secondary" style={{ justifyContent: 'flex-start' }}>
-             <LogOut size={18} /> Sign Out
-           </button>
+
+        <div style={{ marginTop: 'auto', paddingTop: '2rem' }} className="animate-fade-in stagger-2">
+          <button onClick={handleSignOut} className="btn btn-secondary" style={{ justifyContent: 'flex-start' }}>
+            <LogOut size={18} /> Sign Out
+          </button>
         </div>
       </aside>
 
       {/* Main Content Area */}
-      <main className="main-content relative overflow-auto h-screen" style={{height: '100vh', overflowY: 'auto'}}>
+      <main className="main-content relative overflow-auto h-screen" style={{ height: '100vh', overflowY: 'auto' }}>
         <Routes>
           {!isAcceptor && <Route path="/" element={<AddFoodComponent />} />}
           {isAcceptor && <Route path="/" element={<RequestFoodComponent />} />}
