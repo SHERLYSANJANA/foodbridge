@@ -95,13 +95,19 @@ function App() {
 
   const handleSignOut = async () => {
     try {
-      await supabase.auth.signOut();
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        console.error("Supabase sign out returned error:", error);
+      }
     } catch (e) {
       console.error("Sign out error:", e);
     } finally {
       // Force the local session to wipe immediately
       setSession(null);
       setVerifiedStatus(null);
+      setShowAuth(false);
+      setAuthMode("signin");
+
       // Failsafe to manually wipe local storage if Supabase failed to clear it
       for (let key in localStorage) {
         if (key.startsWith("sb-") && key.endsWith("-auth-token")) {

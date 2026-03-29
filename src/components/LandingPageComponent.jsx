@@ -8,6 +8,8 @@ export default function LandingPageComponent({ onNavigateAuth }) {
   const [listingsError, setListingsError] = useState("");
 
   useEffect(() => {
+    let active = true;
+
     const fetchListings = async () => {
       setLoadingListings(true);
       setListingsError("");
@@ -20,16 +22,33 @@ export default function LandingPageComponent({ onNavigateAuth }) {
           .order("updated_at", { ascending: false })
           .limit(8);
 
-        if (error) throw error;
-        setListings(data || []);
+        if (!active) return;
+
+        if (error) {
+          setListingsError(error.message || "Failed to load listings.");
+          setListings([]);
+        } else if (!data || data.length === 0) {
+          setListings([]);
+          setListingsError("No food listings available right now.");
+        } else {
+          setListings(data);
+        }
       } catch (err) {
+        if (!active) return;
+        console.error("Listings fetch failed:", err);
         setListingsError(err.message || "Failed to load listings.");
+        setListings([]);
       } finally {
+        if (!active) return;
         setLoadingListings(false);
       }
     };
 
     fetchListings();
+
+    return () => {
+      active = false;
+    };
   }, []);
 
   return (
