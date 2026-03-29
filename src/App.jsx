@@ -69,13 +69,22 @@ function App() {
     };
   }, []);
 
-  const handleSignOut = () => {
-    // Fire the network call in the background without waiting for it
-    supabase.auth.signOut().catch(e => console.error("Sign out error:", e));
-    
-    // Force the local session to wipe immediately
-    setSession(null);
-    setVerifiedStatus(null);
+  const handleSignOut = async () => {
+    try {
+      await supabase.auth.signOut();
+    } catch (e) {
+      console.error("Sign out error:", e);
+    } finally {
+      // Force the local session to wipe immediately
+      setSession(null);
+      setVerifiedStatus(null);
+      // Failsafe to manually wipe local storage if Supabase failed to clear it
+      for (let key in localStorage) {
+        if (key.startsWith('sb-') && key.endsWith('-auth-token')) {
+          localStorage.removeItem(key);
+        }
+      }
+    }
   };
 
   const toggleTheme = () => {
