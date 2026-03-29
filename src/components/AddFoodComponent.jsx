@@ -54,7 +54,7 @@ export default function AddFoodComponent() {
 
       const { error: insertError } = await supabase.from("donations").insert([
         {
-          donor_id: session?.user?.id,
+          id: session?.user?.id,
           food_name: formData.food_name,
           quantity: parseInt(formData.quantity) || 0,
           location: formData.location.toLowerCase().trim(),
