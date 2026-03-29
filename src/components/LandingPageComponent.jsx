@@ -244,6 +244,17 @@ export default function LandingPageComponent({ onNavigateAuth }) {
                         {item.food_type === "non-veg" ? "Non-Veg" : "Veg"}
                       </span>
                     </div>
+                    <button
+                      className="btn btn-primary"
+                      style={{ width: "100%", marginTop: "0.75rem" }}
+                      onClick={() => {
+                        if (typeof onNavigateAuth === "function") {
+                          onNavigateAuth("signin");
+                        }
+                      }}
+                    >
+                      Order Food
+                    </button>
                   </div>
                 </div>
               );

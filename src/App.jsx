@@ -261,7 +261,7 @@ function App() {
       >
         <Routes>
           {!isAcceptor && <Route path="/" element={<AddFoodComponent />} />}
-          {isAcceptor && <Route path="/" element={<RequestFoodComponent />} />}
+          {isAcceptor && <Route path="/" element={<RequestFoodComponent onNavigateAuth={(mode) => { setAuthMode(mode || 'signin'); setShowAuth(true); }} />} />}
           <Route path="/verify-donor" element={<VerificationComponent />} />
         </Routes>
       </main>

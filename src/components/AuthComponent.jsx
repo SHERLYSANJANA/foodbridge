@@ -169,10 +169,18 @@ export default function AuthComponent({ initialMode = "signin" }) {
 
   const handleFinalSignUp = async (e) => {
     e.preventDefault();
+
+    if (!["donor", "acceptor"].includes(selectedRole)) {
+      setError("Please select Donor or Acceptor role before continuing.");
+      setSignUpStep(0);
+      return;
+    }
+
     if (!agreed) {
       setError("You must agree to terms to create an account.");
       return;
     }
+
     setLoading(true);
     setError("");
     setMsg("");
