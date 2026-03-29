@@ -19,7 +19,7 @@ export default function ViewAllListingsComponent({ onNavigateAuth }) {
           .select(
             "id, food_name, quantity, location, expiry_time, food_type, image_url, created_at",
           )
-          .order("updated_at", { ascending: false });
+          .order("created_at", { ascending: false });
 
         if (!active) return;
 

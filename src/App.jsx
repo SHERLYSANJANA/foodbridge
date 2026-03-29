@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Routes, Route, Link, useLocation } from "react-router-dom";
+import { Routes, Route, Link, useLocation, useNavigate } from "react-router-dom";
 import {
   Home,
   Heart,
@@ -21,6 +21,7 @@ const BackgroundArt = () => null; // Removed old neon background art to match Fi
 
 function App() {
   const location = useLocation();
+  const navigate = useNavigate();
   const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showAuth, setShowAuth] = useState(false);
@@ -115,6 +116,7 @@ function App() {
           localStorage.removeItem(key);
         }
       }
+      navigate("/");
     }
   };
 

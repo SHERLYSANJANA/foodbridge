@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "../supabaseClient";
 import { CheckCircle, AlertCircle } from "lucide-react";
 
-export default function RequestFoodComponent() {
+export default function RequestFoodComponent({ onNavigateAuth }) {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
@@ -12,6 +12,10 @@ export default function RequestFoodComponent() {
     urgency: "medium",
     location: "",
   });
+  const [loadingListings, setLoadingListings] = useState(false);
+  const [listingsError, setListingsError] = useState("");
+  const [listings, setListings] = useState([]);
+  const [orderMessage, setOrderMessage] = useState("");
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -26,9 +30,9 @@ export default function RequestFoodComponent() {
         const { data, error } = await supabase
           .from("donations")
           .select(
-            "id, food_name, quantity, location, expiry_time, food_type, updated_at",
+            "id, food_name, quantity, location, expiry_time, food_type, image_url, created_at",
           )
-          .order("updated_at", { ascending: false })
+          .order("created_at", { ascending: false })
           .limit(20);
 
         if (!active) return;
@@ -227,6 +231,102 @@ export default function RequestFoodComponent() {
             {loading ? "Submitting..." : "Submit Request"}
           </button>
         </form>
+      </div>
+
+      <div className="stagger-3 mt-8">
+        <h2 className="page-title" style={{ fontSize: "1.5rem" }}>Live Food Listings</h2>
+
+        {orderMessage && (
+          <div
+            className="badge badge-ghost"
+            style={{ padding: "1rem", marginBottom: "1rem" }}
+          >
+            {orderMessage}
+          </div>
+        )}
+
+        {listingsError && (
+          <p style={{ color: "#EF4444", textAlign: "center" }}>{listingsError}</p>
+        )}
+
+        {loadingListings ? (
+          <p style={{ textAlign: "center", color: "var(--text-muted)" }}>
+            Loading listings...
+          </p>
+        ) : listings.length === 0 ? (
+          <p style={{ textAlign: "center", color: "var(--text-muted)" }}>
+            No food listings available right now.
+          </p>
+        ) : (
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",
+              gap: "1.5rem",
+              marginTop: "2rem",
+            }}
+          >
+            {listings.map((item) => {
+              const now = new Date();
+              const exp = item.expiry_time ? new Date(item.expiry_time) : null;
+              const expiresIn = exp
+                ? Math.max(0, Math.floor((exp - now) / (1000 * 60)))
+                : null;
+              return (
+                <div className="preview-card" key={item.id} style={{ margin: 0 }}>
+                  {item.image_url ? (
+                    <img
+                      src={item.image_url}
+                      alt={item.food_name}
+                      className="preview-card-image"
+                      style={{
+                        width: "100%",
+                        height: "150px",
+                        objectFit: "cover",
+                        borderRadius: "8px 8px 0 0",
+                      }}
+                    />
+                  ) : (
+                    <div className="preview-card-image-placeholder" />
+                  )}
+                  <div className="preview-card-content">
+                    <h3 className="preview-card-title">{item.food_name}</h3>
+                    <p className="preview-card-meta">
+                      {item.location || "Unknown location"} •{" "}
+                      {item.food_type?.toUpperCase()}
+                    </p>
+                    <div className="preview-card-stats">
+                      <span>
+                        {item.quantity
+                          ? `${item.quantity} portions`
+                          : "Quantity unknown"}
+                      </span>
+                      <span className="preview-card-urgency">
+                        {exp
+                          ? exp < now
+                            ? "Expired"
+                            : `Expires in ${Math.floor(expiresIn / 60)}h ${expiresIn % 60}m`
+                          : "No expiry set"}
+                      </span>
+                    </div>
+                    <div className="preview-tags">
+                      <span className="preview-tag">
+                        {item.food_type === "non-veg" ? "Non-Veg" : "Veg"}
+                      </span>
+                    </div>
+                    <button
+                      className="btn btn-primary"
+                      style={{ width: "100%", marginTop: "0.75rem" }}
+                      onClick={() => handleOrderNow(item)}
+                    >
+                      Order Food
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
     </div>
   );

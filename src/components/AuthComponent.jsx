@@ -59,7 +59,6 @@ export default function AuthComponent({ initialMode = "signin" }) {
   const [acceptorPhone, setAcceptorPhone] = useState("");
 
   const [verificationDoc, setVerificationDoc] = useState(null);
-  const [profilePhoto, setProfilePhoto] = useState(null);
 
   const progressText = () => {
     if (isLogin) return null;
@@ -90,7 +89,6 @@ export default function AuthComponent({ initialMode = "signin" }) {
     setAcceptorCity("");
     setAcceptorPhone("");
     setVerificationDoc(null);
-    setProfilePhoto(null);
     setAgreed(false);
     setMsg("");
     setError("");
@@ -517,14 +515,6 @@ export default function AuthComponent({ initialMode = "signin" }) {
         </label>
       </div>
 
-      <div className="form-group">
-        <label className="form-label">Profile photo (optional)</label>
-        <input
-          type="file"
-          accept="image/*"
-          onChange={(e) => setProfilePhoto(e.target.files?.[0] || null)}
-        />
-      </div>
 
       <div className="form-group">
         <label className="form-label checkbox-label">
