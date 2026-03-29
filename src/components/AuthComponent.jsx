@@ -29,8 +29,8 @@ const GoogleIcon = () => (
   </svg>
 );
 
-export default function AuthComponent() {
-  const [isLogin, setIsLogin] = useState(true);
+export default function AuthComponent({ initialMode = "signin" }) {
+  const [isLogin, setIsLogin] = useState(initialMode !== "signup");
   const [isForgotPassword, setIsForgotPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -122,6 +122,18 @@ export default function AuthComponent() {
     }
     if (password !== confirmPassword) {
       setError("Passwords do not match.");
+      return false;
+    }
+    if (password.length < 8) {
+      setError("Password must be at least 8 characters long.");
+      return false;
+    }
+    const strongPassword =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).+$/;
+    if (!strongPassword.test(password)) {
+      setError(
+        "Password should contain at least one uppercase letter, one lowercase letter, one number, and one special character.",
+      );
       return false;
     }
     return true;
@@ -360,11 +372,12 @@ export default function AuthComponent() {
       {selectedRole === "donor" ? (
         <>
           <div className="form-group">
-            <label className="form-label">Organization / Individual Name</label>
+            <label className="form-label">Organization/Individual Name</label>
             <input
               className="form-input"
               value={donorOrg}
               onChange={(e) => setDonorOrg(e.target.value)}
+              placeholder="e.g. Hillside College Mess"
               required
             />
           </div>

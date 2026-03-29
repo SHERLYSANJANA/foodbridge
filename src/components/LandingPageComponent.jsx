@@ -1,4 +1,4 @@
-import { Heart, MapPin } from 'lucide-react';
+import { Heart, MapPin } from "lucide-react";
 
 export default function LandingPageComponent({ onNavigateAuth }) {
   return (
@@ -9,16 +9,23 @@ export default function LandingPageComponent({ onNavigateAuth }) {
           <Heart fill="#D46A3D" color="#D46A3D" size={28} /> Need for Food
         </a>
         <div className="flex gap-4 items-center">
-          <button 
-            onClick={onNavigateAuth} 
-            style={{background: 'transparent', border: 'none', fontWeight: 600, color: 'var(--text-main)', cursor: 'pointer', fontSize: '1rem'}}
+          <button
+            onClick={() => onNavigateAuth('signin')}
+            style={{
+              background: "transparent",
+              border: "none",
+              fontWeight: 600,
+              color: "var(--text-main)",
+              cursor: "pointer",
+              fontSize: "1rem",
+            }}
           >
             Sign In
           </button>
-          <button 
-            className="btn btn-primary" 
-            onClick={onNavigateAuth}
-            style={{padding: '0.6rem 1.5rem', width: 'auto'}}
+          <button
+            className="btn btn-primary"
+            onClick={() => onNavigateAuth('signup')}
+            style={{ padding: "0.6rem 1.5rem", width: "auto" }}
           >
             Get Started
           </button>
@@ -28,18 +35,22 @@ export default function LandingPageComponent({ onNavigateAuth }) {
       {/* Primary Hero Section */}
       <div className="hero-container animate-fade-in stagger-2">
         <h1 className="hero-title">
-          Good <span className="hero-title-highlight">Food.</span><br/>
-          <span className="hero-title-highlight">Right</span> People.<br/>
-          Right Time.
+          Connecting{" "}
+          <span className="hero-title-highlight highlight-orange">
+            Abundance
+          </span>
+          <br />
+          to <span className="hero-title-highlight highlight-green">Need.</span>
         </h1>
         <p className="hero-subtitle">
-          Join the community connecting food donors with those who need it most. Zero waste, maximum impact.
+          Join the community connecting food donors with those who need it most.
+          Zero waste, maximum impact.
         </p>
         <div className="hero-buttons">
-          <button className="btn btn-primary" onClick={onNavigateAuth}>
+          <button className="btn btn-primary" onClick={() => onNavigateAuth('signup')}>
             I Want to Donate Food
           </button>
-          <button className="btn btn-secondary" onClick={onNavigateAuth}>
+          <button className="btn btn-secondary" onClick={() => onNavigateAuth('signup')}>
             I Need Food
           </button>
         </div>
@@ -48,28 +59,34 @@ export default function LandingPageComponent({ onNavigateAuth }) {
       {/* How It Works Section */}
       <div className="how-it-works-container animate-fade-in stagger-3">
         <h2 className="how-it-works-title">How It Works</h2>
-        
+
         <div className="how-it-works-grid">
           {/* Donors Path */}
           <div className="step-card">
             <div className="step-header">
-              <div className="step-icon step-icon-donor"><Heart size={24} /></div>
+              <div className="step-icon step-icon-donor">
+                <Heart size={24} />
+              </div>
               For Donors
             </div>
-            
+
             <div className="step-list">
               <div className="step-item">
                 <div className="step-number step-number-donor">1</div>
                 <div className="step-text">
                   <h4>List Your Food</h4>
-                  <p>Post details about excess food with photos and pickup times</p>
+                  <p>
+                    Post details about excess food with photos and pickup times
+                  </p>
                 </div>
               </div>
               <div className="step-item">
                 <div className="step-number step-number-donor">2</div>
                 <div className="step-text">
                   <h4>Get Requests</h4>
-                  <p>Acceptors express interest and you choose who receives it</p>
+                  <p>
+                    Acceptors express interest and you choose who receives it
+                  </p>
                 </div>
               </div>
               <div className="step-item">
@@ -85,10 +102,12 @@ export default function LandingPageComponent({ onNavigateAuth }) {
           {/* Acceptors Path */}
           <div className="step-card">
             <div className="step-header">
-              <div className="step-icon step-icon-ngo"><MapPin size={24} /></div>
+              <div className="step-icon step-icon-ngo">
+                <MapPin size={24} />
+              </div>
               For Acceptors
             </div>
-            
+
             <div className="step-list">
               <div className="step-item">
                 <div className="step-number step-number-ngo">1</div>
@@ -113,14 +132,12 @@ export default function LandingPageComponent({ onNavigateAuth }) {
               </div>
             </div>
           </div>
-
         </div>
       </div>
 
       {/* Mock Listings Preview Carousel */}
       <div className="listings-preview-container animate-fade-in stagger-4">
         <div className="horizontal-scroll-wrapper">
-          
           <div className="preview-card">
             <div className="preview-card-image-placeholder"></div>
             <div className="preview-card-content">
@@ -144,7 +161,12 @@ export default function LandingPageComponent({ onNavigateAuth }) {
               <p className="preview-card-meta">City Bakery</p>
               <div className="preview-card-stats">
                 <span>30 packets</span>
-                <span className="preview-card-urgency" style={{color: '#D46A3D'}}>Expires in 5h 30m</span>
+                <span
+                  className="preview-card-urgency"
+                  style={{ color: "#D46A3D" }}
+                >
+                  Expires in 5h 30m
+                </span>
               </div>
               <div className="preview-tags">
                 <span className="preview-tag">Veg</span>
@@ -159,7 +181,12 @@ export default function LandingPageComponent({ onNavigateAuth }) {
               <p className="preview-card-meta">Event Caterers</p>
               <div className="preview-card-stats">
                 <span>25 bowls</span>
-                <span className="preview-card-urgency" style={{color: '#D46A3D'}}>Expires in 1h 45m</span>
+                <span
+                  className="preview-card-urgency"
+                  style={{ color: "#D46A3D" }}
+                >
+                  Expires in 1h 45m
+                </span>
               </div>
               <div className="preview-tags">
                 <span className="preview-tag">Vegan</span>
@@ -175,17 +202,25 @@ export default function LandingPageComponent({ onNavigateAuth }) {
               <p className="preview-card-meta">Community Bake Sale</p>
               <div className="preview-card-stats">
                 <span>40 portions</span>
-                <span className="preview-card-urgency" style={{color: '#D46A3D'}}>Expires in 10h</span>
+                <span
+                  className="preview-card-urgency"
+                  style={{ color: "#D46A3D" }}
+                >
+                  Expires in 10h
+                </span>
               </div>
               <div className="preview-tags">
                 <span className="preview-tag">Veg</span>
               </div>
             </div>
           </div>
-
         </div>
 
-        <button className="btn btn-amber" onClick={onNavigateAuth} style={{marginTop: '3rem', padding: '1rem 2.5rem', fontWeight: 700}}>
+        <button
+          className="btn btn-amber"
+          onClick={onNavigateAuth}
+          style={{ marginTop: "3rem", padding: "1rem 2.5rem", fontWeight: 700 }}
+        >
           View All Listings &rarr;
         </button>
       </div>
@@ -197,8 +232,9 @@ export default function LandingPageComponent({ onNavigateAuth }) {
             <div className="footer-brand">
               <Heart fill="#fff" size={24} color="#fff" /> Need for Food
             </div>
-            <p style={{ color: '#A39B93', lineHeight: 1.6 }}>
-              Connecting communities through food redistribution. Zero waste, maximum impact.
+            <p style={{ color: "#A39B93", lineHeight: 1.6 }}>
+              Connecting communities through food redistribution. Zero waste,
+              maximum impact.
             </p>
           </div>
 
@@ -223,8 +259,12 @@ export default function LandingPageComponent({ onNavigateAuth }) {
           <div>
             <h4 className="footer-column-title">Get Started</h4>
             <div className="footer-links">
-              <button className="footer-link" onClick={onNavigateAuth}>Sign Up</button>
-              <button className="footer-link" onClick={onNavigateAuth}>Sign In</button>
+              <button className="footer-link" onClick={() => onNavigateAuth('signup')}>
+                Sign Up
+              </button>
+              <button className="footer-link" onClick={() => onNavigateAuth('signin')}>
+                Sign In
+              </button>
             </div>
           </div>
         </div>

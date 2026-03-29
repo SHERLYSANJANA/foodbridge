@@ -417,9 +417,17 @@ h4,
 
 .hero-title-highlight {
   color: #fff;
-  background-color: #3b82f6; /* Subtle blue highlight matching Figma */
+  background-color: var(--primary);
   padding: 0 10px;
   display: inline-block;
+}
+
+.hero-title-highlight.highlight-orange {
+  background-color: var(--primary);
+}
+
+.hero-title-highlight.highlight-green {
+  background-color: var(--secondary);
 }
 
 .hero-subtitle {

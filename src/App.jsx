@@ -16,6 +16,7 @@ function App() {
   const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showAuth, setShowAuth] = useState(false);
+  const [authMode, setAuthMode] = useState('signin'); // signin or signup
   const [isLight, setIsLight] = useState(false);
   const [verifiedStatus, setVerifiedStatus] = useState(null);
 
@@ -120,11 +121,11 @@ function App() {
                 Back to Home
               </button>
             </div>
-            <AuthComponent />
+            <AuthComponent initialMode={authMode} />
           </div>
         ) : (
           <div style={{ width: '100vw', zIndex: 10 }}>
-            <LandingPageComponent onNavigateAuth={() => setShowAuth(true)} />
+            <LandingPageComponent onNavigateAuth={(mode) => { setAuthMode(mode || 'signup'); setShowAuth(true); }} />
           </div>
         )}
       </div>
