@@ -38,6 +38,19 @@ function App() {
     await supabase.auth.signOut();
   };
 
+  const handleGuestLogin = (role) => {
+    setSession({
+      isGuest: true,
+      user: {
+        user_metadata: {
+          user_role: role,
+          full_name: 'Guest Tester'
+        }
+      }
+    });
+    setShowAuth(false);
+  };
+
   const toggleTheme = () => {
     setIsLight(prev => {
       const next = !prev;
