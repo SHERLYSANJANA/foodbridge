@@ -30,7 +30,7 @@ export default function RequestFoodComponent({ onNavigateAuth }) {
         const { data, error } = await supabase
           .from("donations")
           .select(
-            "id, food_name, quantity, location, expiry_time, food_type, image_url, created_at",
+            "id, food_name, quantity, location, expiry_time, food_type, image_url, created_at, image_url",
           )
           .order("created_at", { ascending: false })
           .limit(20);

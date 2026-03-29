@@ -142,8 +142,7 @@ export default function AuthComponent({ initialMode = "signin" }) {
       if (
         !donorOrg.trim() ||
         !donorCity.trim() ||
-        !donorAddress.trim() ||
-        !donorPhone.trim()
+        !donorAddress.trim()
       ) {
         setError("Please fill all donor details.");
         return false;
@@ -155,8 +154,7 @@ export default function AuthComponent({ initialMode = "signin" }) {
       }
       if (
         !acceptorReason.trim() ||
-        !acceptorCity.trim() ||
-        !acceptorPhone.trim()
+        !acceptorCity.trim()
       ) {
         setError("Please fill all acceptor details.");
         return false;
@@ -425,7 +423,7 @@ export default function AuthComponent({ initialMode = "signin" }) {
               className="form-input"
               value={donorPhone}
               onChange={(e) => setDonorPhone(e.target.value)}
-              required
+              placeholder="Optional"
             />
           </div>
         </>
@@ -468,7 +466,7 @@ export default function AuthComponent({ initialMode = "signin" }) {
               className="form-input"
               value={acceptorPhone}
               onChange={(e) => setAcceptorPhone(e.target.value)}
-              required
+              placeholder="Optional"
             />
           </div>
         </>

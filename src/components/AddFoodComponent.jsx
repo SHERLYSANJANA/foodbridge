@@ -66,8 +66,28 @@ export default function AddFoodComponent() {
         },
       ]);
 
-      if (insertError) {
-        throw insertError;
+      if (insertError) throw insertError;
+      const newDonationId = data?.[0]?.id;
+
+      let fileUrl = null;
+      if (imageFile && newDonationId) {
+        setLoading(true);
+        const fileExt = imageFile.name.split('.').pop();
+        const fileName = `${newDonationId}-${Date.now()}.${fileExt}`;
+        const { error: uploadError } = await supabase.storage
+          .from('food-images')
+          .upload(fileName, imageFile);
+
+        if (!uploadError) {
+          const { data: publicData } = supabase.storage
+            .from('food-images')
+            .getPublicUrl(fileName);
+          fileUrl = publicData?.publicUrl;
+
+          await supabase.from('donations')
+            .update({ image_url: fileUrl })
+            .eq('id', newDonationId);
+        }
       }
 
       setSuccess("Food donation added successfully!");
