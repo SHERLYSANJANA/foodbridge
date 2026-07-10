@@ -24,7 +24,6 @@ export default function VerificationComponent() {
         // Polling existing validation applications
         const { data: requests } = await supabase.from('verification_requests')
           .select('*')
-          .eq('donor_id', session.user.id)
           .order('created_at', { ascending: false })
           .limit(1);
           
@@ -43,9 +42,13 @@ export default function VerificationComponent() {
     if (!session) return;
     setLoading(true);
     setMsg('');
+    if (!session?.user) {
+      setMsg('Please sign in before applying for verified status.');
+      setLoading(false);
+      return;
+    }
 
     const { error } = await supabase.from('verification_requests').insert([{
-      donor_id: session.user.id,
       name: formData.name,
       organization: formData.organization,
       food_type: formData.food_type,
@@ -66,7 +69,7 @@ export default function VerificationComponent() {
     <div className="animate-fade-in stagger-1">
       <h1 className="page-title">Donor Verification</h1>
       <p className="hero-subtitle stagger-2" style={{maxWidth: '800px', marginBottom: '2rem'}}>
-        Become a verified donor to earn a badge of trust, ensuring NFTs and NGOs can safely prioritize your logistics and handle surplus food optimally.
+        Become a verified donor to earn a badge of trust, helping NGOs safely prioritize your logistics and handle surplus food quickly.
       </p>
       
       <div className="card animate-fade-in stagger-3" style={{ maxWidth: '600px' }}>

@@ -45,7 +45,6 @@ function App() {
           const { data, error } = await supabase
             .from("verification_requests")
             .select("status")
-            .eq("donor_id", currentSession.user.id)
             .order("created_at", { ascending: false })
             .limit(1);
           if (error) console.error("Verification check failed:", error);
@@ -71,7 +70,6 @@ function App() {
           const { data, error } = await supabase
             .from("verification_requests")
             .select("status")
-            .eq("donor_id", newSession.user.id)
             .order("created_at", { ascending: false })
             .limit(1);
           if (!error && data && data.length > 0)
@@ -194,12 +192,20 @@ function App() {
           </Link>
           <div className="nav-links animate-fade-in stagger-1">
             {!isAcceptor && (
-              <Link
-                to="/"
-                className={`nav-link ${location.pathname === "/" ? "active" : ""}`}
-              >
-                <Home size={20} /> Add Food
-              </Link>
+              <>
+                <Link
+                  to="/"
+                  className={`nav-link ${location.pathname === "/" ? "active" : ""}`}
+                >
+                  <Home size={20} /> Add Food
+                </Link>
+                <Link
+                  to="/dashboard"
+                  className={`nav-link ${location.pathname === "/dashboard" ? "active" : ""}`}
+                >
+                  <ListOrdered size={20} /> Donations & Requests
+                </Link>
+              </>
             )}
             {isAcceptor && (
               <>
@@ -214,6 +220,12 @@ function App() {
                   className={`nav-link ${location.pathname === "/listings" ? "active" : ""}`}
                 >
                   <ListOrdered size={20} /> View All Listings
+                </Link>
+                <Link
+                  to="/dashboard"
+                  className={`nav-link ${location.pathname === "/dashboard" ? "active" : ""}`}
+                >
+                  <ListOrdered size={20} /> Donations & Requests
                 </Link>
               </>
             )}
@@ -281,6 +293,7 @@ function App() {
               }
             />
           )}
+          <Route path="/dashboard" element={<LiveMatchesComponent />} />
           <Route path="/verify-donor" element={<VerificationComponent />} />
         </Routes>
       </main>

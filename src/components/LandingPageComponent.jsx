@@ -17,7 +17,7 @@ export default function LandingPageComponent({ onNavigateAuth }) {
         const { data, error } = await supabase
           .from("donations")
           .select(
-            "id, food_name, quantity, location, expiry_time, food_type, image_url, created_at",
+            "food_name, quantity, location, expiry_time, food_type, image_url, created_at",
           )
           .order("created_at", { ascending: false })
           .limit(8);
@@ -39,8 +39,7 @@ export default function LandingPageComponent({ onNavigateAuth }) {
         setListingsError(err.message || "Failed to load listings.");
         setListings([]);
       } finally {
-        if (!active) return;
-        setLoadingListings(false);
+        if (active) setLoadingListings(false);
       }
     };
 
@@ -217,7 +216,7 @@ export default function LandingPageComponent({ onNavigateAuth }) {
                 ? Math.max(0, Math.floor((exp - now) / (1000 * 60)))
                 : null;
               return (
-                <div className="preview-card" key={item.id}>
+                <div className="preview-card" key={`${item.created_at}-${item.food_name}`}>
                   {item.image_url ? (
                     <img
                       src={item.image_url}
@@ -236,7 +235,7 @@ export default function LandingPageComponent({ onNavigateAuth }) {
                   <div className="preview-card-content">
                     <h3 className="preview-card-title">{item.food_name}</h3>
                     <p className="preview-card-meta">
-                      {item.location || "Unknown location"} •{" "}
+                      {item.location || "Unknown location"} -{" "}
                       {item.food_type?.toUpperCase()}
                     </p>
                     <div className="preview-card-stats">

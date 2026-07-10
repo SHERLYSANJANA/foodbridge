@@ -30,7 +30,7 @@ export default function RequestFoodComponent({ onNavigateAuth }) {
         const { data, error } = await supabase
           .from("donations")
           .select(
-            "id, food_name, quantity, location, expiry_time, food_type, image_url, created_at, image_url",
+            "food_name, quantity, location, expiry_time, food_type, image_url, created_at",
           )
           .order("created_at", { ascending: false })
           .limit(20);
@@ -48,8 +48,7 @@ export default function RequestFoodComponent({ onNavigateAuth }) {
         setListingsError(err.message || "Failed to load listings.");
         setListings([]);
       } finally {
-        if (!active) return;
-        setLoadingListings(false);
+        if (active) setLoadingListings(false);
       }
     };
 
@@ -71,13 +70,12 @@ export default function RequestFoodComponent({ onNavigateAuth }) {
         return;
       }
 
-      // Here we can persis order intent to requests (or orders) table if desired.
-      const { error: orderError } = await supabase.from("orders").insert([
+      const { error: orderError } = await supabase.from("requests").insert([
         {
-          acceptor_id: session.user.id,
-          donation_id: donation.id,
+          food_name: donation.food_name,
           quantity: donation.quantity || 1,
-          status: "placed",
+          urgency: "high",
+          location: donation.location || "Pickup location pending",
         },
       ]);
 
@@ -103,9 +101,13 @@ export default function RequestFoodComponent({ onNavigateAuth }) {
         data: { session },
       } = await supabase.auth.getSession();
 
+      if (!session?.user) {
+        setError("Please sign in before submitting a request.");
+        return;
+      }
+
       const { error: insertError } = await supabase.from("requests").insert([
         {
-          acceptor_id: session?.user?.id,
           food_name: formData.food_name.trim(),
           quantity: parseInt(formData.quantity) || 0,
           urgency: formData.urgency,
@@ -273,7 +275,7 @@ export default function RequestFoodComponent({ onNavigateAuth }) {
                 ? Math.max(0, Math.floor((exp - now) / (1000 * 60)))
                 : null;
               return (
-                <div className="preview-card" key={item.id} style={{ margin: 0 }}>
+                <div className="preview-card" key={`${item.created_at}-${item.food_name}`} style={{ margin: 0 }}>
                   {item.image_url ? (
                     <img
                       src={item.image_url}
@@ -292,7 +294,7 @@ export default function RequestFoodComponent({ onNavigateAuth }) {
                   <div className="preview-card-content">
                     <h3 className="preview-card-title">{item.food_name}</h3>
                     <p className="preview-card-meta">
-                      {item.location || "Unknown location"} •{" "}
+                      {item.location || "Unknown location"} -{" "}
                       {item.food_type?.toUpperCase()}
                     </p>
                     <div className="preview-card-stats">

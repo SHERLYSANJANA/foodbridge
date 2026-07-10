@@ -6,6 +6,7 @@ export default function AddFoodComponent() {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
+  const [warning, setWarning] = useState("");
   const [formData, setFormData] = useState({
     food_name: "",
     quantity: "",
@@ -24,37 +25,42 @@ export default function AddFoodComponent() {
     setLoading(true);
     setSuccess("");
     setError("");
-
-    if (!foodImage) {
-      setError("Please upload a photo of the food.");
-      setLoading(false);
-      return;
-    }
+    setWarning("");
 
     try {
       const {
         data: { session },
       } = await supabase.auth.getSession();
 
-      // Upload image to Supabase storage
-      const fileExt = foodImage.name.split(".").pop();
-      const fileName = `${session?.user?.id}_${Date.now()}.${fileExt}`;
-      const { data: uploadData, error: uploadError } = await supabase.storage
-        .from("food-images")
-        .upload(fileName, foodImage);
-
-      if (uploadError) {
-        throw uploadError;
+      if (!session?.user) {
+        setError("Please sign in before adding a donation.");
+        setLoading(false);
+        return;
       }
 
-      // Get public URL
-      const {
-        data: { publicUrl },
-      } = supabase.storage.from("food-images").getPublicUrl(fileName);
+      let publicUrl = null;
+
+      if (foodImage) {
+        const fileExt = foodImage.name.split(".").pop();
+        const fileName = `${session.user.id}_${Date.now()}.${fileExt}`;
+        const { error: uploadError } = await supabase.storage
+          .from("food-images")
+          .upload(fileName, foodImage);
+
+        if (uploadError) {
+          setWarning(
+            `The food details were saved without a photo because image upload failed: ${uploadError.message}`,
+          );
+        } else {
+          const {
+            data: { publicUrl: uploadedUrl },
+          } = supabase.storage.from("food-images").getPublicUrl(fileName);
+          publicUrl = uploadedUrl;
+        }
+      }
 
       const { error: insertError } = await supabase.from("donations").insert([
         {
-          donor_id: session?.user?.id,
           food_name: formData.food_name,
           quantity: parseInt(formData.quantity) || 0,
           location: formData.location.trim(),
@@ -118,6 +124,20 @@ export default function AddFoodComponent() {
             }}
           >
             <AlertCircle size={18} /> {error}
+          </div>
+        )}
+        {warning && (
+          <div
+            className="badge badge-outline"
+            style={{
+              padding: "1.25rem",
+              width: "100%",
+              marginBottom: "1.5rem",
+              display: "flex",
+              gap: "10px",
+            }}
+          >
+            <AlertCircle size={18} /> {warning}
           </div>
         )}
 
@@ -187,12 +207,11 @@ export default function AddFoodComponent() {
           </div>
 
           <div className="form-group animate-fade-in stagger-6">
-            <label className="form-label">Food Photo</label>
+            <label className="form-label">Food Photo (Optional)</label>
             <input
               type="file"
               accept="image/*"
               onChange={(e) => setFoodImage(e.target.files[0])}
-              required
               style={{ padding: "0.5rem" }}
             />
             {foodImage && (
